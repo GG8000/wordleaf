@@ -1,0 +1,85 @@
+{
+  "app": { "title": "So Kleever", "tagline": "Das kooperative Kleeblatt-Wortspiel" },
+  "common": { "leave": "Verlassen", "host": "Host", "you": "du", "points": "{{count}} Pkt.", "online": "online", "offline": "offline" },
+  "config": { "missing": "Supabase ist nicht konfiguriert. Kopiere .env.example nach .env und trage Projekt-URL und Anon-Key ein." },
+  "login": {
+    "nickname": "Dein Spitzname",
+    "placeholder": "z. B. Kim",
+    "join": "An den Tisch setzen",
+    "joining": "Beitreten…",
+    "inProgress": "Gerade läuft eine Partie. Du kannst beitreten, sobald sie vorbei ist.",
+    "retry": "Nochmal versuchen"
+  },
+  "lobby": {
+    "title": "Lobby",
+    "players": "Spieler:innen ({{count}}/10)",
+    "cardLang": "Kartensprache",
+    "start": "Spiel starten",
+    "needPlayers": "Zum Starten braucht ihr 2 bis 10 Spieler:innen.",
+    "waitingHost": "Warte darauf, dass {{name}} das Spiel startet…",
+    "kick": "Entfernen",
+    "rulesTitle": "So wird gespielt",
+    "rules": [
+      "Alle bekommen ein Kleeblatt mit 4 Wortkarten. Jedes Blatt berührt zwei Wörter.",
+      "Schreibe pro Blatt einen Hinweis aus einem Wort, der beide Wörter verbindet.",
+      "Dann wird reihum jedes Kleeblatt gelöst: Die Karten werden mit einer zusätzlichen Täuschkarte gemischt, und die anderen müssen sie anhand der Hinweise richtig legen und drehen.",
+      "Wer das Kleeblatt geschrieben hat, schweigt! Alle 4 im ersten Versuch richtig: 6 Punkte. Sonst bleiben die richtigen Karten liegen, der Rest geht zurück, und ein zweiter Versuch bringt 1 Punkt pro richtiger Karte."
+    ]
+  },
+  "writing": {
+    "title": "Schreibe deine Hinweise",
+    "hint": "Ein Wort pro Blatt. Es soll die beiden angrenzenden Wörter verbinden.",
+    "leaf": ["Oben", "Rechts", "Unten", "Links"],
+    "submit": "Hinweise abgeben",
+    "edit": "Hinweise ändern",
+    "submitted": "Abgegeben! Warte auf die anderen…",
+    "status": "Fertig: {{done}}/{{total}}",
+    "force": "Jetzt mit dem Raten beginnen",
+    "forceHint": "Wer noch nicht abgegeben hat, wird übersprungen."
+  },
+  "guessing": {
+    "title": "Kleeblatt {{n}} von {{total}}: {{name}}",
+    "yourClover": "Das ist dein Kleeblatt. Schweigen und zuschauen!",
+    "attempt": "Versuch {{n}}/2",
+    "attempt2": "Richtige Karten bleiben liegen. Versucht es mit dem Rest nochmal.",
+    "tray": "Karten",
+    "trayHint": "Tippe eine Karte an, dann ein Feld. ↻ dreht die Karte.",
+    "submit": "Prüfen",
+    "needFour": "Legt 4 Karten, um zu prüfen.",
+    "return": "Zurücklegen",
+    "yourSolution": "Deine Lösung",
+    "revealTitle_one": "{{count}} Punkt!",
+    "revealTitle_other": "{{count}} Punkte!",
+    "perfect": "Perfekt im ersten Versuch!",
+    "solution": "Lösung",
+    "yourGuess": "Tipp des Teams",
+    "next": "Nächstes Kleeblatt",
+    "finish": "Zum Ergebnis"
+  },
+  "results": {
+    "title": "Spielende",
+    "score": "Teampunkte: {{score}} / {{max}}",
+    "tiers": ["Verwelkte Blätter… nochmal!", "Ein kleiner Keimling.", "Das wächst schön!", "Ein Glücksklee!", "Vierblättrige Legenden!"],
+    "backToLobby": "Zurück zur Lobby",
+    "newGame": "Nochmal spielen",
+    "left": "gegangen"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen: {{msg}}",
+    "invalid_name": "Bitte wähle einen Namen mit 1–20 Zeichen.",
+    "game_in_progress": "Es läuft bereits eine Partie.",
+    "room_full": "Der Tisch ist voll (10 Spieler:innen).",
+    "not_host": "Das darf nur der Host.",
+    "need_2_to_10_players": "Ihr braucht 2 bis 10 Spieler:innen.",
+    "not_enough_words": "Nicht genug Wörter in der Kartensprache.",
+    "clue_must_be_one_word": "Jeder Hinweis muss aus einem Wort bestehen.",
+    "need_4_clues": "Bitte fülle alle 4 Hinweise aus.",
+    "place_4_cards": "Legt zuerst 4 Karten.",
+    "card_locked": "Diese Karte ist fixiert.",
+    "slot_locked": "Dieses Feld ist fixiert.",
+    "author_cannot_guess": "Pssst! Das ist dein Kleeblatt.",
+    "wrong_phase": "Das Spiel ist schon weiter. Bitte nochmal versuchen.",
+    "not_in_room": "Du sitzt nicht mehr am Tisch."
+  },
+  "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
+}

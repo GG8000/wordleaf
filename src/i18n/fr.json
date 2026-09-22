@@ -1,0 +1,85 @@
+{
+  "app": { "title": "So Kleever", "tagline": "Le jeu de mots coopératif du trèfle" },
+  "common": { "leave": "Quitter", "host": "Hôte", "you": "toi", "points": "{{count}} pts", "online": "en ligne", "offline": "hors ligne" },
+  "config": { "missing": "Supabase n'est pas configuré. Copie .env.example vers .env et renseigne l'URL du projet et la clé anon." },
+  "login": {
+    "nickname": "Ton pseudo",
+    "placeholder": "ex. Kim",
+    "join": "Rejoindre la table",
+    "joining": "Connexion…",
+    "inProgress": "Une partie est en cours. Tu pourras rejoindre à la fin.",
+    "retry": "Réessayer"
+  },
+  "lobby": {
+    "title": "Salon",
+    "players": "Joueurs ({{count}}/10)",
+    "cardLang": "Langue des cartes",
+    "start": "Lancer la partie",
+    "needPlayers": "Il faut 2 à 10 joueurs pour commencer.",
+    "waitingHost": "En attente que {{name}} lance la partie…",
+    "kick": "Retirer",
+    "rulesTitle": "Comment jouer",
+    "rules": [
+      "Chacun reçoit un trèfle avec 4 cartes de mots. Chaque feuille touche deux mots.",
+      "Écris un indice d'un seul mot par feuille qui relie les deux mots.",
+      "Ensuite, chaque trèfle est résolu à tour de rôle : les cartes sont mélangées avec une carte leurre, et les autres doivent les placer et les tourner correctement grâce aux indices.",
+      "L'auteur reste silencieux ! Les 4 justes du premier coup : 6 points. Sinon, les bonnes cartes restent, les autres reviennent, et un second essai rapporte 1 point par carte juste."
+    ]
+  },
+  "writing": {
+    "title": "Écris tes indices",
+    "hint": "Un mot par feuille, qui relie les deux mots voisins.",
+    "leaf": ["Haut", "Droite", "Bas", "Gauche"],
+    "submit": "Valider les indices",
+    "edit": "Modifier les indices",
+    "submitted": "Validé ! En attente des autres…",
+    "status": "Prêts : {{done}}/{{total}}",
+    "force": "Commencer à deviner",
+    "forceHint": "Les joueurs qui n'ont pas validé seront ignorés."
+  },
+  "guessing": {
+    "title": "Trèfle {{n}} sur {{total}} : {{name}}",
+    "yourClover": "C'est ton trèfle. Silence, et regarde !",
+    "attempt": "Essai {{n}}/2",
+    "attempt2": "Les bonnes cartes restent en place. Réessayez avec le reste.",
+    "tray": "Cartes",
+    "trayHint": "Touche une carte, puis une case. ↻ pour tourner.",
+    "submit": "Vérifier",
+    "needFour": "Placez 4 cartes pour vérifier.",
+    "return": "Retirer",
+    "yourSolution": "Ta solution",
+    "revealTitle_one": "{{count}} point !",
+    "revealTitle_other": "{{count}} points !",
+    "perfect": "Parfait du premier coup !",
+    "solution": "Solution",
+    "yourGuess": "Proposition de l'équipe",
+    "next": "Trèfle suivant",
+    "finish": "Voir les résultats"
+  },
+  "results": {
+    "title": "Fin de partie",
+    "score": "Score d'équipe : {{score}} / {{max}}",
+    "tiers": ["Feuilles fanées… on recommence !", "Une petite pousse.", "Ça pousse bien !", "Un trèfle porte-bonheur !", "Légendes à quatre feuilles !"],
+    "backToLobby": "Retour au salon",
+    "newGame": "Rejouer",
+    "left": "parti"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue : {{msg}}",
+    "invalid_name": "Choisis un nom de 1 à 20 caractères.",
+    "game_in_progress": "Une partie est déjà en cours.",
+    "room_full": "La table est pleine (10 joueurs).",
+    "not_host": "Seul l'hôte peut faire ça.",
+    "need_2_to_10_players": "Il faut 2 à 10 joueurs.",
+    "not_enough_words": "Pas assez de mots dans cette langue.",
+    "clue_must_be_one_word": "Chaque indice doit être un seul mot.",
+    "need_4_clues": "Remplis les 4 indices.",
+    "place_4_cards": "Placez d'abord 4 cartes.",
+    "card_locked": "Cette carte est verrouillée.",
+    "slot_locked": "Cette case est verrouillée.",
+    "author_cannot_guess": "Chut ! C'est ton trèfle.",
+    "wrong_phase": "La partie a avancé. Réessaie.",
+    "not_in_room": "Tu n'es plus à la table."
+  },
+  "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
+}

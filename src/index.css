@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+body {
+  @apply bg-emerald-50 text-stone-900 antialiased;
+  font-family: ui-rounded, "Nunito", system-ui, sans-serif;
+}

@@ -1,0 +1,85 @@
+{
+  "app": { "title": "So Kleever", "tagline": "The cooperative clover word game" },
+  "common": { "leave": "Leave", "host": "Host", "you": "you", "points": "{{count}} pts", "online": "online", "offline": "offline" },
+  "config": { "missing": "Supabase is not configured. Copy .env.example to .env and fill in your project URL and anon key." },
+  "login": {
+    "nickname": "Your nickname",
+    "placeholder": "e.g. Kim",
+    "join": "Join the table",
+    "joining": "Joining…",
+    "inProgress": "A game is running right now. You can join once it is over.",
+    "retry": "Try again"
+  },
+  "lobby": {
+    "title": "Lobby",
+    "players": "Players ({{count}}/10)",
+    "cardLang": "Card language",
+    "start": "Start game",
+    "needPlayers": "You need 2 to 10 players to start.",
+    "waitingHost": "Waiting for {{name}} to start the game…",
+    "kick": "Remove",
+    "rulesTitle": "How to play",
+    "rules": [
+      "Everyone gets a clover with 4 word cards. Each leaf touches two words.",
+      "Write one single-word clue per leaf that links both words.",
+      "Then each clover is solved in turn: the cards are shuffled with one extra decoy card, and the others have to place and rotate them correctly using the clues.",
+      "The author stays silent! All 4 right on the first try: 6 points. Otherwise the correct cards stay, the rest go back, and a second try scores 1 point per correct card."
+    ]
+  },
+  "writing": {
+    "title": "Write your clues",
+    "hint": "One word per leaf. It should link both words next to it.",
+    "leaf": ["Top", "Right", "Bottom", "Left"],
+    "submit": "Submit clues",
+    "edit": "Edit clues",
+    "submitted": "Submitted! Waiting for the others…",
+    "status": "Ready: {{done}}/{{total}}",
+    "force": "Start guessing now",
+    "forceHint": "Players who did not submit will be skipped."
+  },
+  "guessing": {
+    "title": "Clover {{n}} of {{total}}: {{name}}",
+    "yourClover": "This is your clover. Stay silent and watch!",
+    "attempt": "Attempt {{n}}/2",
+    "attempt2": "Correct cards stay locked. Try again with the rest.",
+    "tray": "Cards",
+    "trayHint": "Tap a card, then tap a slot. Tap ↻ to rotate.",
+    "submit": "Check",
+    "needFour": "Place 4 cards to check.",
+    "return": "Back to tray",
+    "yourSolution": "Your solution",
+    "revealTitle_one": "{{count}} point!",
+    "revealTitle_other": "{{count}} points!",
+    "perfect": "Perfect on the first try!",
+    "solution": "Solution",
+    "yourGuess": "Team guess",
+    "next": "Next clover",
+    "finish": "See results"
+  },
+  "results": {
+    "title": "Game over",
+    "score": "Team score: {{score}} / {{max}}",
+    "tiers": ["Wilted leaves… try again!", "A small sprout.", "Nicely growing!", "A lucky clover!", "Four-leaf legends!"],
+    "backToLobby": "Back to lobby",
+    "newGame": "Play again",
+    "left": "left"
+  },
+  "errors": {
+    "generic": "Something went wrong: {{msg}}",
+    "invalid_name": "Please choose a name with 1–20 characters.",
+    "game_in_progress": "A game is already running.",
+    "room_full": "The table is full (10 players).",
+    "not_host": "Only the host can do that.",
+    "need_2_to_10_players": "You need 2 to 10 players.",
+    "not_enough_words": "Not enough words in the card language.",
+    "clue_must_be_one_word": "Each clue must be a single word.",
+    "need_4_clues": "Please fill in all 4 clues.",
+    "place_4_cards": "Place 4 cards first.",
+    "card_locked": "That card is locked.",
+    "slot_locked": "That slot is locked.",
+    "author_cannot_guess": "Shh! It is your clover.",
+    "wrong_phase": "The game has moved on. Please try again.",
+    "not_in_room": "You are not at the table anymore."
+  },
+  "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
+}
