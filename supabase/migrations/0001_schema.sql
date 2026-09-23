@@ -1,4 +1,4 @@
--- So Kleever: schema, RLS and realtime.
+-- Wordleaf: schema, RLS and realtime.
 -- All writes go through the security-definer RPCs in 0002_functions.sql;
 -- clients only get SELECT access here.
 

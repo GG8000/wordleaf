@@ -12,7 +12,7 @@ export function LanguageSwitcher() {
           type="button"
           onClick={() => i18n.changeLanguage(l)}
           className={`rounded-full px-2 py-1 uppercase ${
-            i18n.resolvedLanguage === l ? 'bg-emerald-600 text-white' : 'text-stone-600 hover:bg-emerald-100'
+            i18n.resolvedLanguage === l ? 'bg-leaf-600 text-white' : 'text-stone-600 hover:bg-leaf-100'
           }`}
         >
           {l}

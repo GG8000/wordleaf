@@ -1,5 +1,5 @@
 {
-  "app": { "title": "So Kleever", "tagline": "Le jeu de mots coopératif du trèfle" },
+  "app": { "title": "Wordleaf", "tagline": "Le jeu de mots coopératif du trèfle", "credit": "Wordleaf est un projet de fan non officiel, inspiré du jeu de société So Clover! de François Romain (Repos Production). Sans lien avec l’éditeur. Jouez à l’original !" },
   "common": { "leave": "Quitter", "host": "Hôte", "you": "toi", "points": "{{count}} pts", "online": "en ligne", "offline": "hors ligne" },
   "config": { "missing": "Supabase n'est pas configuré. Copie .env.example vers .env et renseigne l'URL du projet et la clé anon." },
   "login": {
@@ -14,6 +14,12 @@
     "title": "Salon",
     "players": "Joueurs ({{count}}/10)",
     "cardLang": "Langue des cartes",
+    "level": "Niveau",
+    "levels": [
+      { "name": "Facile", "desc": "Mots aléatoires. La carte leurre n’a que des thèmes absents du trèfle, on la repère donc facilement." },
+      { "name": "Moyen", "desc": "Mots aléatoires, mais chaque mot de la carte leurre partage un thème avec un mot près d’une feuille (comme Lion et Tigre). Elle semble donc à sa place." },
+      { "name": "Difficile", "desc": "Tout le trèfle et la carte leurre viennent d’environ trois thèmes (comme les animaux, la nourriture et la météo). Les indices doivent être précis, et chaque carte semble pouvoir aller partout." }
+    ],
     "start": "Lancer la partie",
     "needPlayers": "Il faut 2 à 10 joueurs pour commencer.",
     "waitingHost": "En attente que {{name}} lance la partie…",
@@ -72,6 +78,7 @@
     "not_host": "Seul l'hôte peut faire ça.",
     "need_2_to_10_players": "Il faut 2 à 10 joueurs.",
     "not_enough_words": "Pas assez de mots dans cette langue.",
+    "invalid_level": "Niveau invalide.",
     "clue_must_be_one_word": "Chaque indice doit être un seul mot.",
     "need_4_clues": "Remplis les 4 indices.",
     "place_4_cards": "Placez d'abord 4 cartes.",

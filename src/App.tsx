@@ -39,7 +39,7 @@ export default function App() {
   return (
     <div className="min-h-screen px-4 pb-16">
       <header className="mx-auto flex max-w-4xl items-center justify-between gap-3 py-4">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold text-emerald-800">
+        <h1 className="flex items-center gap-2 text-2xl font-extrabold text-leaf-800">
           🍀 <span>{t('app.title')}</span>
         </h1>
         <div className="flex items-center gap-3">
@@ -61,6 +61,7 @@ export default function App() {
         </div>
       </header>
       <main className="mx-auto max-w-4xl">{content}</main>
+      <footer className="mx-auto mt-12 max-w-xl text-center text-xs text-stone-500">{t('app.credit')}</footer>
       {toast && (
         <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
           {toast}

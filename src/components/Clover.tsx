@@ -14,15 +14,23 @@ interface Props {
   onLeafClick?: (leaf: number) => void
 }
 
+// Clues can be up to 30 characters, so shrink long ones instead of cutting them off
+function leafSize(text: string): string {
+  if (text.length <= 10) return 'text-sm'
+  if (text.length <= 18) return 'text-xs'
+  return 'text-[10px]'
+}
+
 function Leaf({ text, vertical, active, onClick }: { text?: string | null; vertical?: boolean; active?: boolean; onClick?: () => void }) {
   return (
     <div
       onClick={onClick}
+      title={text || undefined}
       className={`flex items-center justify-center rounded-full px-2 py-1.5 text-center font-bold uppercase text-white shadow-sm ${
-        active ? 'bg-emerald-700 ring-4 ring-amber-300' : 'bg-emerald-600'
-      } ${vertical ? 'min-h-24 w-9 [writing-mode:vertical-rl]' : 'min-w-24 h-9'} ${onClick ? 'cursor-pointer' : ''}`}
+        active ? 'bg-leaf-700 ring-4 ring-amber-300' : 'bg-leaf-600'
+      } ${vertical ? 'min-h-24 min-w-9 [writing-mode:vertical-rl]' : 'min-w-24 min-h-9'} ${onClick ? 'cursor-pointer' : ''}`}
     >
-      <span className={`truncate text-sm ${vertical ? 'max-h-40' : 'max-w-48'} ${text ? '' : 'opacity-40'}`}>{text || '…'}</span>
+      <span className={`break-all leading-tight ${leafSize(text ?? '')} ${text ? '' : 'opacity-40'}`}>{text || '…'}</span>
     </div>
   )
 }
@@ -37,8 +45,8 @@ export function Clover({ board, clues, selectedCard, lockedSlots = [], slotStatu
         <div
           key={i}
           onClick={onSlotClick ? () => onSlotClick(i) : undefined}
-          className={`aspect-square w-full rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 ${
-            onSlotClick ? 'cursor-pointer hover:bg-emerald-100' : ''
+          className={`aspect-square w-full rounded-xl border-2 border-dashed border-leaf-300 bg-leaf-50/60 ${
+            onSlotClick ? 'cursor-pointer hover:bg-leaf-100' : ''
           }`}
         />
       )
@@ -64,7 +72,7 @@ export function Clover({ board, clues, selectedCard, lockedSlots = [], slotStatu
       <div className="flex justify-center"><Leaf text={clues[0]} active={activeLeaf === 0} onClick={leaf(0)} /></div>
       <div />
       <div className="flex justify-center"><Leaf text={clues[3]} vertical active={activeLeaf === 3} onClick={leaf(3)} /></div>
-      <div className="grid grid-cols-2 gap-2 rounded-2xl bg-emerald-200/70 p-2">
+      <div className="grid grid-cols-2 gap-2 rounded-2xl bg-leaf-200/70 p-2">
         {slot(0)}
         {slot(1)}
         {slot(3)}

@@ -1,8 +1,16 @@
-# 🍀 So Kleever Online
+# 🍀 Wordleaf
 
-An online multiplayer take on the cooperative word-association board game **So Kleever!** (*So Clover!* in English), built to play with friends. It has one shared lobby, 2–10 players, and joining takes seconds with just a nickname.
+A cooperative online word-association game for 2–10 friends. Everyone links pairs of words on their own leaf board with one-word clues, then the group works together to rebuild each other's boards. There's one shared lobby, and joining takes seconds with just a nickname.
 
-> This is a fan project for private use. The word list is original and not taken from the published game.
+I built Wordleaf because I wanted to play this game online with my friends while I was on a semester abroad in France.
+
+## Credits and inspiration
+
+Wordleaf is an unofficial fan project **inspired by the board game *So Clover!*** (German edition: *So Kleever!*), designed by François Romain and published by [Repos Production](https://www.rprod.com). If you enjoy Wordleaf, please buy and play the original.
+
+- Wordleaf is **not affiliated with, endorsed by or sponsored by** Repos Production, Asmodee or the designer. *So Clover!* and *So Kleever!* are their trademarks.
+- The name, code, visual design, rules text and word list are original. No artwork, card text or rules text from the published game are used.
+- It's meant for private, non-commercial play.
 
 ---
 
@@ -45,6 +53,17 @@ The inner edges of the cards are not used.
    - Placing a card on a filled slot sends the card that was there back to the tray.
 3. The **author only watches and has to stay silent.** The server rejects any move from the author.
 4. **Check** needs 4 placed cards. A card only counts if it is in the right **slot with the right rotation**.
+
+### Levels
+Every word in the pool has a theme category (animals, food, weather, …). The host picks a level in the lobby, and "Play again" keeps it.
+
+| Level | Clover words | Decoy card |
+|-------|--------------|------------|
+| 🍀 Easy | random | only themes that are **not** on the clover, so it stands out |
+| 🍀🍀 Medium (default) | random | each word shares a theme with a different word next to a clue, so it looks like it belongs |
+| 🍀🍀🍀 Hard | all from about 3 themes (max 7 words per theme) | from the same themes, so every card looks like it could fit |
+
+The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql`. New words without a category go into `misc`.
 
 ### Scoring (team score)
 
@@ -194,7 +213,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │   └── migrations/
 │       ├── 0001_schema.sql     # tables, RLS, realtime publication, 'main' room
 │       ├── 0002_functions.sql  # game logic RPCs
-│       └── 0003_words.sql      # word pool en/de/fr
+│       ├── 0003_words.sql      # word pool en/de/fr
+│       └── 0004_levels.sql     # word categories + difficulty levels
 └── scripts/smoke-test.mjs      # full-game backend test
 ```
 

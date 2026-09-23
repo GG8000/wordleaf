@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
+/* Wordleaf palette: a warmer, slightly more yellow-green take on emerald */
+@theme {
+  --color-leaf-50: oklch(0.977 0.02 112);
+  --color-leaf-100: oklch(0.95 0.045 132);
+  --color-leaf-200: oklch(0.905 0.075 136);
+  --color-leaf-300: oklch(0.845 0.11 140);
+  --color-leaf-400: oklch(0.76 0.14 143);
+  --color-leaf-500: oklch(0.67 0.15 145);
+  --color-leaf-600: oklch(0.56 0.135 146);
+  --color-leaf-700: oklch(0.48 0.115 147);
+  --color-leaf-800: oklch(0.4 0.09 148);
+  --color-leaf-900: oklch(0.34 0.07 149);
+}
+
 body {
-  @apply bg-emerald-50 text-stone-900 antialiased;
+  @apply bg-leaf-50 text-stone-900 antialiased;
   font-family: ui-rounded, "Nunito", system-ui, sans-serif;
 }

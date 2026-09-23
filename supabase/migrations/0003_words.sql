@@ -1,4 +1,4 @@
--- So Kleever: word pool (original list, en/de/fr). Add more words with the same pattern.
+-- Wordleaf: word pool (original list, en/de/fr). Add more words with the same pattern.
 
 insert into public.words (lang, word) values
   ('en', 'Apple'),

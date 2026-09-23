@@ -17,7 +17,7 @@ export function PlayerList({ players, hostId, userId, online, badge, onKick }: P
       {players.map((p) => (
         <li key={p.user_id} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 shadow-sm">
           <span
-            className={`h-2.5 w-2.5 rounded-full ${online.has(p.user_id) ? 'bg-emerald-500' : 'bg-stone-300'}`}
+            className={`h-2.5 w-2.5 rounded-full ${online.has(p.user_id) ? 'bg-leaf-500' : 'bg-stone-300'}`}
             title={online.has(p.user_id) ? t('common.online') : t('common.offline')}
           />
           <span className="flex-1 truncate font-medium">

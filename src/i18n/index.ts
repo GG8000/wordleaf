@@ -4,7 +4,7 @@ import en from './en.json'
 import de from './de.json'
 import fr from './fr.json'
 
-const KEY = 'kleever-lang'
+const KEY = 'wordleaf-lang'
 const supported = ['en', 'de', 'fr']
 
 function initialLang(): string {

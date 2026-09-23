@@ -86,12 +86,12 @@ export function GuessingPhase({ room, clovers, cards, solutions, userId, patchRo
 
       {room.revealing && (
         <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-bold text-emerald-700">{t('guessing.revealTitle', { count: clover?.points ?? 0 })}</p>
+          <p className="text-2xl font-bold text-leaf-700">{t('guessing.revealTitle', { count: clover?.points ?? 0 })}</p>
           {clover?.points === POINTS_PERFECT && <p className="text-stone-600">{t('guessing.perfect')} 🍀</p>}
           <button
             type="button"
             onClick={() => rpc('next_clover').catch(() => {})}
-            className="mt-3 rounded-xl bg-emerald-600 px-6 py-2 font-bold text-white hover:bg-emerald-700"
+            className="mt-3 rounded-xl bg-leaf-600 px-6 py-2 font-bold text-white hover:bg-leaf-700"
           >
             {isLast ? t('guessing.finish') : t('guessing.next')}
           </button>
@@ -155,7 +155,7 @@ export function GuessingPhase({ room, clovers, cards, solutions, userId, patchRo
                 type="button"
                 onClick={submit}
                 disabled={placed !== 4 || busy}
-                className="rounded-xl bg-emerald-600 px-8 py-3 font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="rounded-xl bg-leaf-600 px-8 py-3 font-bold text-white hover:bg-leaf-700 disabled:opacity-50"
               >
                 {t('guessing.submit')}
               </button>

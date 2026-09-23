@@ -1,5 +1,5 @@
 {
-  "app": { "title": "So Kleever", "tagline": "The cooperative clover word game" },
+  "app": { "title": "Wordleaf", "tagline": "The cooperative clover word game", "credit": "Wordleaf is an unofficial fan project inspired by the board game So Clover! by François Romain (Repos Production). Not affiliated with the publisher. Go play the original!" },
   "common": { "leave": "Leave", "host": "Host", "you": "you", "points": "{{count}} pts", "online": "online", "offline": "offline" },
   "config": { "missing": "Supabase is not configured. Copy .env.example to .env and fill in your project URL and anon key." },
   "login": {
@@ -14,6 +14,12 @@
     "title": "Lobby",
     "players": "Players ({{count}}/10)",
     "cardLang": "Card language",
+    "level": "Level",
+    "levels": [
+      { "name": "Easy", "desc": "Random words. The decoy card only has themes that are not on the clover, so it is easy to spot." },
+      { "name": "Medium", "desc": "Random words, but each word on the decoy card shares a theme with a word next to a clue (like Lion and Tiger), so it looks like it belongs." },
+      { "name": "Hard", "desc": "The whole clover and the decoy come from about three themes (like animals, food and weather). Clues have to be precise, and every card looks like it could fit anywhere." }
+    ],
     "start": "Start game",
     "needPlayers": "You need 2 to 10 players to start.",
     "waitingHost": "Waiting for {{name}} to start the game…",
@@ -72,6 +78,7 @@
     "not_host": "Only the host can do that.",
     "need_2_to_10_players": "You need 2 to 10 players.",
     "not_enough_words": "Not enough words in the card language.",
+    "invalid_level": "Invalid level.",
     "clue_must_be_one_word": "Each clue must be a single word.",
     "need_4_clues": "Please fill in all 4 clues.",
     "place_4_cards": "Place 4 cards first.",

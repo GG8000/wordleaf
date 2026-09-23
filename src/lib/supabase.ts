@@ -8,8 +8,11 @@ export const isConfigured = Boolean(url && key)
 // `?p=2` gives the tab its own session so one browser can act as several players
 const profile = new URLSearchParams(window.location.search).get('p')
 
+// Sessions are stored per Supabase project, so switching local <-> hosted never reuses a foreign token
+const project = url ? new URL(url).host : 'none'
+
 export const supabase = createClient(url ?? 'http://localhost', key ?? 'missing', {
-  auth: { storageKey: profile ? `kleever-auth-p${profile}` : 'kleever-auth' },
+  auth: { storageKey: `wordleaf-auth-${project}${profile ? `-p${profile}` : ''}` },
 })
 
 export const ROOM_ID = 'main'

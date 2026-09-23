@@ -20,10 +20,13 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
   const isHost = room.host_id === userId
   const done = clovers.filter((c) => c.submitted).length
 
-  // Restore submitted clues (e.g. after reload or when editing)
+  // Sync with the server's clues: restores them after reload/editing, and clears leftovers when a new game
+  // starts (the room flips to 'writing' before the fresh clovers arrive). Keyed by content so refetches
+  // don't overwrite what the player is typing.
+  const serverClues = mine?.clues?.join('\n') ?? ''
   useEffect(() => {
-    if (mine?.clues) setClues(mine.clues)
-  }, [mine?.clues])
+    setClues(serverClues ? serverClues.split('\n') : ['', '', '', ''])
+  }, [serverClues])
 
   if (!mine) {
     return <p className="text-center text-stone-600">{t('writing.submitted')}</p>
@@ -52,7 +55,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
         />
         {mine.submitted ? (
           <div className="flex flex-col items-center gap-2">
-            <p className="font-semibold text-emerald-700">{t('writing.submitted')}</p>
+            <p className="font-semibold text-leaf-700">{t('writing.submitted')}</p>
             <button type="button" onClick={() => rpc('edit_clues').catch(() => {})} className="text-sm text-stone-600 underline">
               {t('writing.edit')}
             </button>
@@ -84,7 +87,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
                     onFocus={() => setActive(i)}
                     onChange={(e) => setClues((c) => c.map((v, j) => (j === i ? e.target.value : v)))}
                     className={`rounded-xl border px-3 py-2 text-base font-normal text-stone-900 focus:outline-none ${
-                      invalid ? 'border-rose-400' : 'border-stone-300 focus:border-emerald-500'
+                      invalid ? 'border-rose-400' : 'border-stone-300 focus:border-leaf-500'
                     }`}
                   />
                 </label>
@@ -93,7 +96,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
             <button
               type="submit"
               disabled={!allValid || busy}
-              className="mt-2 rounded-xl bg-emerald-600 py-3 font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="mt-2 rounded-xl bg-leaf-600 py-3 font-bold text-white hover:bg-leaf-700 disabled:opacity-50"
             >
               {t('writing.submit')}
             </button>
@@ -118,7 +121,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
               type="button"
               onClick={() => rpc('force_guessing').catch(() => {})}
               disabled={done === 0}
-              className="rounded-xl border border-emerald-600 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+              className="rounded-xl border border-leaf-600 py-2 text-sm font-semibold text-leaf-700 hover:bg-leaf-50 disabled:opacity-50"
             >
               {t('writing.force')}
             </button>

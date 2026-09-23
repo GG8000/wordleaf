@@ -1,5 +1,6 @@
 export type Status = 'lobby' | 'writing' | 'guessing' | 'finished'
 export type Lang = 'en' | 'de' | 'fr'
+export type Level = 1 | 2 | 3
 
 export interface Placement {
   slot: number | null
@@ -11,6 +12,7 @@ export interface Room {
   host_id: string | null
   status: Status
   card_lang: Lang
+  level: Level
   turn_order: string[]
   current_turn: number
   attempt: number

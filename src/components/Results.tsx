@@ -16,7 +16,7 @@ export function Results({ room, clovers, players, userId }: GameProps) {
       <h2 className="text-2xl font-bold">{t('results.title')}</h2>
       <div className="rounded-3xl bg-white p-6 shadow">
         <div className="text-5xl">{'🍀'.repeat(Math.max(tier, 1))}</div>
-        <p className="mt-2 text-xl font-bold text-emerald-700">{t('results.score', { score: room.score, max })}</p>
+        <p className="mt-2 text-xl font-bold text-leaf-700">{t('results.score', { score: room.score, max })}</p>
         <p className="text-stone-600">{(t('results.tiers', { returnObjects: true }) as string[])[tier]}</p>
       </div>
       <ul className="flex flex-col gap-1 text-left">
@@ -35,14 +35,14 @@ export function Results({ room, clovers, players, userId }: GameProps) {
           <button
             type="button"
             onClick={() => rpc('start_game', { p_card_lang: room.card_lang }).catch(() => {})}
-            className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700"
+            className="rounded-xl bg-leaf-600 px-5 py-3 font-bold text-white hover:bg-leaf-700"
           >
             {t('results.newGame')}
           </button>
           <button
             type="button"
             onClick={() => rpc('back_to_lobby').catch(() => {})}
-            className="rounded-xl border border-emerald-600 px-5 py-3 font-semibold text-emerald-700 hover:bg-emerald-50"
+            className="rounded-xl border border-leaf-600 px-5 py-3 font-semibold text-leaf-700 hover:bg-leaf-50"
           >
             {t('results.backToLobby')}
           </button>

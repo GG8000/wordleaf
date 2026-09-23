@@ -1,4 +1,4 @@
--- So Kleever: game logic as RPCs. Every function locks the room row first so
+-- Wordleaf: game logic as RPCs. Every function locks the room row first so
 -- concurrent calls are serialised.
 
 -- Scoring constants

@@ -27,7 +27,7 @@ const edgeClass = [
 export function CardView({ card, rotation, selected, locked, status, onClick, onRotate }: Props) {
   const ring =
     status === 'correct'
-      ? 'ring-4 ring-emerald-500'
+      ? 'ring-4 ring-leaf-500'
       : status === 'wrong'
         ? 'ring-4 ring-rose-500'
         : selected

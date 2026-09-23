@@ -1,5 +1,5 @@
 {
-  "app": { "title": "So Kleever", "tagline": "Das kooperative Kleeblatt-Wortspiel" },
+  "app": { "title": "Wordleaf", "tagline": "Das kooperative Kleeblatt-Wortspiel", "credit": "Wordleaf ist ein inoffizielles Fanprojekt, inspiriert vom Brettspiel So Kleever! von François Romain (Repos Production). Keine Verbindung zum Verlag. Spielt unbedingt das Original!" },
   "common": { "leave": "Verlassen", "host": "Host", "you": "du", "points": "{{count}} Pkt.", "online": "online", "offline": "offline" },
   "config": { "missing": "Supabase ist nicht konfiguriert. Kopiere .env.example nach .env und trage Projekt-URL und Anon-Key ein." },
   "login": {
@@ -14,6 +14,12 @@
     "title": "Lobby",
     "players": "Spieler:innen ({{count}}/10)",
     "cardLang": "Kartensprache",
+    "level": "Schwierigkeit",
+    "levels": [
+      { "name": "Leicht", "desc": "Zufällige Wörter. Die Täuschkarte hat nur Themen, die nicht auf dem Kleeblatt vorkommen, und fällt deshalb leicht auf." },
+      { "name": "Mittel", "desc": "Zufällige Wörter, aber jedes Wort der Täuschkarte teilt ein Thema mit einem Wort an einem Blatt (wie Löwe und Tiger). Sie wirkt also, als gehöre sie dazu." },
+      { "name": "Schwer", "desc": "Das ganze Kleeblatt und die Täuschkarte stammen aus etwa drei Themen (wie Tiere, Essen und Wetter). Hinweise müssen genau sein, und jede Karte scheint überall zu passen." }
+    ],
     "start": "Spiel starten",
     "needPlayers": "Zum Starten braucht ihr 2 bis 10 Spieler:innen.",
     "waitingHost": "Warte darauf, dass {{name}} das Spiel startet…",
@@ -72,6 +78,7 @@
     "not_host": "Das darf nur der Host.",
     "need_2_to_10_players": "Ihr braucht 2 bis 10 Spieler:innen.",
     "not_enough_words": "Nicht genug Wörter in der Kartensprache.",
+    "invalid_level": "Ungültige Schwierigkeit.",
     "clue_must_be_one_word": "Jeder Hinweis muss aus einem Wort bestehen.",
     "need_4_clues": "Bitte fülle alle 4 Hinweise aus.",
     "place_4_cards": "Legt zuerst 4 Karten.",

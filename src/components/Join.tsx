@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { rpc } from '../lib/rpc'
 import type { Status } from '../lib/types'
 
-const NAME_KEY = 'kleever-name'
+const NAME_KEY = 'wordleaf-name'
 
 interface Props {
   ensureSession: () => Promise<unknown>
@@ -51,7 +51,7 @@ export function Join({ ensureSession, onJoined, status }: Props) {
       <label className="flex flex-col gap-1 text-sm font-semibold text-stone-700">
         {t('login.nickname')}
         <input
-          className="rounded-xl border border-stone-300 px-3 py-2 text-base font-normal focus:border-emerald-500 focus:outline-none"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-base font-normal focus:border-leaf-500 focus:outline-none"
           value={name}
           maxLength={20}
           placeholder={t('login.placeholder')}
@@ -63,7 +63,7 @@ export function Join({ ensureSession, onJoined, status }: Props) {
       <button
         type="submit"
         disabled={busy || !name.trim()}
-        className="rounded-xl bg-emerald-600 py-3 font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+        className="rounded-xl bg-leaf-600 py-3 font-bold text-white hover:bg-leaf-700 disabled:opacity-50"
       >
         {busy ? t('login.joining') : inProgress ? t('login.retry') : t('login.join')}
       </button>
