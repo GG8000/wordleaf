@@ -20,10 +20,9 @@ export default function PlayerMap({ onClose }: Props) {
 
   useEffect(() => {
     const map = L.map(container.current!, { worldCopyJump: true, minZoom: 1, maxZoom: 9 }).setView([30, 10], 2)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
+    // OpenStreetMap's own tiles need no API key (usage policy: attribution + light traffic)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map)
     layer.current = L.layerGroup().addTo(map)
     return () => {
