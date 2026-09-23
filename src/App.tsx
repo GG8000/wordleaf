@@ -4,6 +4,8 @@ import { GuessingPhase } from './components/GuessingPhase'
 import { Join } from './components/Join'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { Lobby } from './components/Lobby'
+import { DuelList } from './components/duel/DuelList'
+import { DuelView } from './components/duel/DuelView'
 import { Results } from './components/Results'
 import { EffectsLayer } from './components/Effects'
 import { InstallApp } from './components/InstallApp'
@@ -11,8 +13,12 @@ import { UpdateBanner } from './components/UpdateBanner'
 import { LOADER_LOOP_MS, WordleafLoader } from './components/WordleafLoader'
 import { WritingPhase } from './components/WritingPhase'
 import { useAuth } from './hooks/useAuth'
+import { useDuel } from './hooks/useDuel'
+import { useDuels } from './hooks/useDuels'
 import { useRoom } from './hooks/useRoom'
+import { setDuelId, useDuelId } from './lib/duel'
 import { useInstall } from './lib/install'
+import { listenForOpenDuel, syncPush } from './lib/push'
 import { PUBLIC_ROOM, setRoomId, useRoomId } from './lib/room'
 import { rpc } from './lib/rpc'
 import { isConfigured, supabase } from './lib/supabase'
@@ -30,6 +36,19 @@ export default function App() {
   const { room, players, loaded, refetch } = roomData
   const me = players.find((p) => p.user_id === userId)
   const inRoom = Boolean(me)
+
+  // Duels: `?duel=CODE` shows one duel instead of the room; the overview sits under the join form
+  const duelId = useDuelId()
+  const duelData = useDuel(userId, duelId)
+  const { duels } = useDuels(userId)
+  const { duel } = duelData
+  const inDuelRound = Boolean(duelId && (duel?.status === 'writing' || duel?.status === 'guessing'))
+
+  // Keep the push subscription tied to whoever is signed in, and open duels from tapped notifications
+  useEffect(() => {
+    if (userId) void syncPush().catch(() => {})
+  }, [userId])
+  useEffect(() => listenForOpenDuel(setDuelId), [])
 
   // Heartbeat: the server closes the lobby when the host misses 2 minutes of these
   useEffect(() => {
@@ -70,10 +89,22 @@ export default function App() {
   let content
   if (!isConfigured) {
     content = <p className="mx-auto mt-10 max-w-md rounded-xl bg-rose-100 p-4 text-rose-900">{t('config.missing')}</p>
-  } else if (!introDone || !ready || (userId && !loaded)) {
+  } else if (!introDone || !ready || (userId && !(duelId ? duelData.loaded : loaded))) {
     content = <div className="mt-10"><WordleafLoader /></div>
+  } else if (duelId) {
+    content =
+      userId && duel ? (
+        <DuelView {...duelData} duel={duel} userId={userId} onShowInstall={() => setInstallOpen(true)} />
+      ) : (
+        <Join ensureSession={ensureSession} hasSession={Boolean(userId)} onJoined={duelData.refetch} duelId={duelId} />
+      )
   } else if (!userId || !me || !room) {
-    content = <Join ensureSession={ensureSession} hasSession={Boolean(userId)} onJoined={refetch} status={room?.status} />
+    content = (
+      <>
+        <Join ensureSession={ensureSession} hasSession={Boolean(userId)} onJoined={refetch} status={room?.status} />
+        <DuelList duels={duels} onShowInstall={() => setInstallOpen(true)} />
+      </>
+    )
   } else {
     const props = { ...roomData, room, userId }
     content = {
@@ -101,18 +132,21 @@ export default function App() {
           <span>{t('app.title')}</span>
         </h1>
         <div className="flex items-center gap-3">
-          {me && roomId !== PUBLIC_ROOM && (
+          {duelId && duel && (
+            <span className="rounded-full bg-leaf-100 px-3 py-1 font-mono text-sm font-bold tracking-widest text-leaf-800">⚔️ {duelId}</span>
+          )}
+          {!duelId && me && roomId !== PUBLIC_ROOM && (
             <span className="rounded-full bg-leaf-100 px-3 py-1 font-mono text-sm font-bold tracking-widest text-leaf-800" title={t('lobby.code')}>
               {roomId}
             </span>
           )}
-          {room && room.status !== 'lobby' && me && (
+          {!duelId && room && room.status !== 'lobby' && me && (
             <span className="hidden rounded-full bg-white px-3 py-1 text-sm font-semibold sm:inline">
               {t('common.points', { count: room.score })}
             </span>
           )}
           <LanguageSwitcher />
-          {me && (
+          {!duelId && me && (
             <button
               type="button"
               onClick={() => {
@@ -163,7 +197,7 @@ export default function App() {
       )}
       {installOpen && <InstallApp onClose={() => setInstallOpen(false)} />}
       <EffectsLayer />
-      <UpdateBanner inGame={inRoom} />
+      <UpdateBanner inGame={inRoom || inDuelRound} />
       {toast && (
         <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
           {toast}

@@ -15,6 +15,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
+        // Push notifications for duels (public/push-sw.js)
+        importScripts: ['push-sw.js'],
       },
     }),
   ],

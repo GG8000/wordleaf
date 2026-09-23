@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { shareLocation } from '../lib/geo'
+import { setDuelId } from '../lib/duel'
 import { normalizeRoom, PUBLIC_ROOM, setRoomId, useRoomId } from '../lib/room'
-import { createRoom, rpc } from '../lib/rpc'
+import { createDuel, createRoom, duelRpc, rpc } from '../lib/rpc'
+import { supabase } from '../lib/supabase'
 import { showToast } from '../lib/toast'
 import type { Status } from '../lib/types'
 import { Turnstile, TURNSTILE_SITE_KEY } from './Turnstile'
@@ -15,6 +17,8 @@ interface Props {
   hasSession: boolean
   onJoined: () => void
   status?: Status
+  /** Opened from a duel link: join that duel instead of a room */
+  duelId?: string | null
 }
 
 function savedName(): string {
@@ -25,14 +29,14 @@ function savedName(): string {
   }
 }
 
-export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
+export function Join({ ensureSession, hasSession, onJoined, status, duelId }: Props) {
   const { t, i18n } = useTranslation()
   const [name, setName] = useState(savedName)
   const [busy, setBusy] = useState(false)
   const [code, setCode] = useState('')
   const roomId = useRoomId()
-  const isPublic = roomId === PUBLIC_ROOM
-  const inProgress = status === 'writing' || status === 'guessing'
+  const isPublic = roomId === PUBLIC_ROOM && !duelId
+  const inProgress = !duelId && (status === 'writing' || status === 'guessing')
 
   // Captcha only guards the anonymous sign-in, so returning players never see it
   const needsCaptcha = Boolean(TURNSTILE_SITE_KEY) && !hasSession
@@ -40,8 +44,8 @@ export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
   const [captchaRound, setCaptchaRound] = useState(0) // bump to get a fresh single-use token
   const [captchaBroken, setCaptchaBroken] = useState(false)
 
-  /** Sign in if needed, then join the public table, a lobby by code, or a new private lobby */
-  async function enter(target: 'current' | 'code' | 'create') {
+  /** Sign in if needed, then join the public table, a lobby or duel by code, or start a private lobby or duel */
+  async function enter(target: 'current' | 'code' | 'create' | 'duel') {
     setBusy(true)
     try {
       try {
@@ -53,6 +57,14 @@ export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
       }
       if (target === 'create') {
         setRoomId(await createRoom(name.trim()))
+      } else if (target === 'duel') {
+        setDuelId(await createDuel(name.trim(), i18n.language))
+      } else if (target === 'current' && duelId) {
+        await duelRpc('join_duel', { p_name: name.trim() })
+      } else if (target === 'code' && (await isDuelCode(code))) {
+        const id = normalizeRoom(code)
+        await duelRpc('join_duel', { p_duel: id, p_name: name.trim() })
+        setDuelId(id)
       } else {
         const room = target === 'code' ? normalizeRoom(code) : roomId
         await rpc('join_room', { p_name: name.trim(), p_room: room })
@@ -116,9 +128,11 @@ export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
           ? t('login.joining')
           : inProgress
             ? t('login.retry')
-            : isPublic
-              ? t('login.joinPublic')
-              : t('login.joinLobby', { code: roomId })}
+            : duelId
+              ? t('duel.accept', { code: duelId })
+              : isPublic
+                ? t('login.joinPublic')
+                : t('login.joinLobby', { code: roomId })}
       </button>
       {isPublic ? (
         <>
@@ -135,6 +149,15 @@ export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
           >
             {t('login.createLobby')}
           </button>
+          <button
+            type="button"
+            onClick={() => enter('duel')}
+            disabled={!canSubmit}
+            className="rounded-xl border border-leaf-600 py-2.5 font-bold text-leaf-700 hover:bg-leaf-50 disabled:opacity-50"
+          >
+            {t('duel.create')}
+          </button>
+          <p className="-mt-2 text-center text-xs text-stone-500">{t('duel.createHint')}</p>
           <div className="flex flex-col gap-1">
             <span className="text-sm font-semibold text-stone-700">{t('login.haveCode')}</span>
             <div className="flex gap-2">
@@ -168,12 +191,20 @@ export function Join({ ensureSession, hasSession, onJoined, status }: Props) {
       ) : (
         <button
           type="button"
-          onClick={() => setRoomId(PUBLIC_ROOM)}
+          onClick={() => (duelId ? setDuelId(null) : setRoomId(PUBLIC_ROOM))}
           className="text-sm text-stone-500 underline hover:text-leaf-700"
         >
-          {t('login.backToPublic')}
+          {duelId ? t('duel.back') : t('login.backToPublic')}
         </button>
       )}
     </form>
   )
+}
+
+/** Room and duel codes share one namespace: a code that isn't a room is treated as a duel */
+async function isDuelCode(code: string): Promise<boolean> {
+  const id = normalizeRoom(code)
+  if (id === PUBLIC_ROOM) return false
+  const { data } = await supabase.rpc('get_room', { p_room: id })
+  return !(data as unknown[] | null)?.length
 }

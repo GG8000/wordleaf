@@ -136,6 +136,22 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - The layout works on mobile: tapping replaces drag-and-drop, and the boards resize.
 - **Animations** (CSS only, turned off when the device asks for reduced motion): cards deal onto the board, drop into slots and spin when rotated; a splash announces the round and each clover; correct cards cheer and wrong ones shake on reveal; a perfect clover rains 🍀, zero points drops 🍂; the final score counts up; ready ticks pop; the author's 🤫 wiggles; and the 🍀 in the header spins when you tap it. Full-screen effects live in `src/lib/effects.ts` + `src/components/Effects.tsx`.
 
+### Duels (asynchronous, 1 vs 1)
+For friends who can't be online at the same time. There are no heartbeats and no timeouts, and each player can have any number of duels running.
+
+```
+waiting ──join──► writing ──both submitted──► guessing ──both solved──► finished
+```
+
+- On the join screen, **⚔️ Start a duel** creates a duel and shows a code plus an invite link (`/?duel=K7QF`). The other person joins with the link or types the code into the same code field used for lobbies. Room and duel codes share one namespace.
+- Each player writes their own clover whenever they like. Card shuffle works as in the live game.
+- Once both clovers are in, each player solves the **other's** clover **alone** on their own board (`duel_guesses`), with the same 2 attempts and scoring. The author can watch their opponent's board. The team score is the sum of both (max 12).
+- After the duel, **Rematch** starts a new duel with the same two players; both players pressing it end up in the same one.
+- **Your duels** under the join form lists all your duels, with the ones where it's your turn on top.
+- **Notifications:** the other player gets a Web Push message when you join, when both clovers are in, when you solved their clover, on a rematch and when you leave. On iPhone this only works in the installed app (iOS 16.4+). See *Push notifications* under Deployment.
+- **Identity:** duels belong to the anonymous session of the browser. On iPhone, the installed app and Safari keep **separate** sessions, so app users should enter the code in the app instead of opening the link.
+- Unanswered duels are deleted after 7 days, and any duel is deleted after 30 days without activity.
+
 ### Out of scope for now (see the roadmap)
 - In-game chat (use Discord or a call)
 - A writing timer
@@ -271,9 +287,13 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0006_shuffle.sql    # card shuffle
 │       ├── 0007_stale_players.sql  # remove silent players, reset abandoned games
 │       ├── 0008_lobbies_and_map.sql  # private lobbies with codes, membership RLS, player map
-│       └── 0009_map_history.sql      # map keeps past play locations
+│       ├── 0009_map_history.sql      # map keeps past play locations
+│       ├── 0010_duels.sql            # asynchronous 1v1 duels + notifications outbox
+│       └── 0011_push.sql             # push subscriptions, trigger -> send-push
+│   └── functions/send-push/    # Edge Function that sends Web Push (VAPID)
 └── scripts/
     ├── smoke-test.mjs          # full-game backend test
+    ├── smoke-duel.mjs          # duel backend test (npm run smoke:duel)
     └── make-icons.sh           # renders the PNG icons from public/icon.svg (needs rsvg-convert)
 ```
 
@@ -302,6 +322,7 @@ After changing the SQL, run `npx supabase db reset` to re-apply the migrations.
 npm test                    # unit tests (board geometry, rotation, rating)
 npm run typecheck
 SUPABASE_SERVICE_KEY=<secret key from `npx supabase status`> npm run smoke
+SUPABASE_SERVICE_KEY=<secret key from `npx supabase status`> npm run smoke:duel
 ```
 
 The smoke test resets the `main` room and plays through the game with 3 anonymous players. It checks:
@@ -334,6 +355,26 @@ The smoke test resets the `main` room and plays through the game with 3 anonymou
    - output directory `dist`
    - env vars `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (the publishable key) and `VITE_TURNSTILE_SITE_KEY` (the Turnstile **site** key)
 6. Share the URL with your friends. 🍀
+
+### Push notifications for duels (optional)
+
+Duels work without this; players just don't get notified.
+
+1. Generate a VAPID key pair: `npx web-push generate-vapid-keys`.
+2. Deploy the function and set its secrets:
+   ```bash
+   npx supabase functions deploy send-push
+   npx supabase secrets set VAPID_PUBLIC_KEY=<public> VAPID_PRIVATE_KEY=<private> \
+     VAPID_SUBJECT=mailto:you@example.com PUSH_HOOK_SECRET=<long random string>
+   ```
+3. Tell the database where to post notifications (SQL editor):
+   ```sql
+   select vault.create_secret('https://<ref>.supabase.co/functions/v1/send-push', 'push_function_url');
+   select vault.create_secret('<same PUSH_HOOK_SECRET>', 'push_hook_secret');
+   ```
+4. Add `VITE_VAPID_PUBLIC_KEY=<public>` to the frontend env vars and redeploy.
+
+Push needs the service worker, so it only works in a production build (`npm run build && npm run preview` locally), not in `npm run dev`. Locally, run `npx supabase functions serve send-push --env-file <file with the secrets>` and use `http://host.docker.internal:54321/functions/v1/send-push` as `push_function_url`.
 
 Do steps 4 and 5 together: with CAPTCHA protection on in Supabase but no site key in the frontend, nobody new can sign in.
 

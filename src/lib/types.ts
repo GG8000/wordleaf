@@ -63,3 +63,50 @@ export interface MapPoint {
   players_week: number
   players_total: number
 }
+
+export type DuelStatus = 'waiting' | 'writing' | 'guessing' | 'finished' | 'abandoned'
+
+export interface Duel {
+  id: string
+  card_lang: Lang
+  level: Level
+  allow_shuffle: boolean
+  status: DuelStatus
+  created_by: string | null
+  rematch_id: string | null
+  updated_at: string
+}
+
+export interface DuelPlayer {
+  user_id: string
+  name: string
+  joined_at: string
+  clues: string[] | null
+  submitted: boolean
+  shuffled: boolean
+  /** What the opponent scored on this player's clover; null until solved */
+  points: number | null
+}
+
+/** One player's own board for the opponent's clover */
+export interface DuelGuess {
+  guesser_id: string
+  owner_id: string
+  state: Record<string, Placement>
+  attempt: number
+  locked_slots: number[]
+  done: boolean
+  updated_at: string
+}
+
+/** A row of my_duels() */
+export interface DuelSummary {
+  id: string
+  status: DuelStatus
+  opponent_name: string | null
+  my_turn: boolean
+  score: number
+  card_lang: Lang
+  level: Level
+  updated_at: string
+}

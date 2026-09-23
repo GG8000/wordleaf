@@ -1,4 +1,5 @@
 import i18n from '../i18n'
+import { getDuelId } from './duel'
 import { getRoomId } from './room'
 import { supabase } from './supabase'
 import { showToast } from './toast'
@@ -21,6 +22,26 @@ export function errorText(code: string): string {
 /** Open a private lobby and join it. Returns its code. */
 export async function createRoom(name: string): Promise<string> {
   const { data, error } = await supabase.rpc('create_room', { p_name: name })
+  if (error) {
+    showToast(errorText(error.message))
+    throw error
+  }
+  return data as string
+}
+
+/** Call a duel RPC for the open duel (`p_duel`). Errors are shown as a translated toast and re-thrown. */
+export async function duelRpc<T = void>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
+  const { data, error } = await supabase.rpc(fn, { p_duel: getDuelId(), ...args })
+  if (error) {
+    showToast(errorText(error.message))
+    throw error
+  }
+  return data as T
+}
+
+/** Open a duel and wait for an opponent. Returns its code. */
+export async function createDuel(name: string, cardLang: string): Promise<string> {
+  const { data, error } = await supabase.rpc('create_duel', { p_name: name, p_card_lang: cardLang })
   if (error) {
     showToast(errorText(error.message))
     throw error
