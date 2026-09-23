@@ -1,6 +1,5 @@
--- Wordleaf: room chat, kind words only.
--- The host can turn a chat on in the lobby; it stays on during the game. While a clover is
--- being guessed, its author stays silent, so they can't chat either. Every message goes through send_chat(), which
+-- Wordleaf: lobby chat, kind words only.
+-- The host can turn a chat on in the lobby. Every message goes through send_chat(), which
 -- rejects anything on a small blocklist of insults, swear words and slurs (en/de/fr) with
 -- 'chat_not_nice'. Before matching, the text is normalized so the usual tricks don't slip
 -- through: case, accents, leetspeak (sh1t), punctuation inside words (f.u.c.k), spaced-out
@@ -130,8 +129,7 @@ create trigger clear_chat_if_empty after delete on public.room_players
 
 -- RPCs ---------------------------------------------------------------------------
 
--- Host only. Turning it on happens in the lobby, turning it off works any time.
--- Unlike set_settings this keeps everyone's ready.
+-- Host only, in the lobby. Unlike set_settings this keeps everyone's ready.
 create or replace function public.set_chat(p_enabled boolean, p_room text default 'main')
 returns void
 language plpgsql security definer set search_path = public as $$
@@ -140,8 +138,8 @@ begin
   uid := _require_player(p_room);
   r := _lock_room(p_room);
   if r.host_id is distinct from uid then raise exception 'not_host'; end if;
+  if r.status <> 'lobby' then raise exception 'wrong_phase'; end if;
   if r.allow_chat = p_enabled then return; end if;
-  if p_enabled and r.status <> 'lobby' then raise exception 'wrong_phase'; end if;
   update rooms set allow_chat = p_enabled, updated_at = now() where id = p_room;
   if not p_enabled then delete from chat_messages where room_id = p_room; end if;
 end $$;
@@ -154,10 +152,7 @@ begin
   uid := _require_player(p_room);
   select * into r from rooms where id = p_room;
   if not r.allow_chat then raise exception 'chat_disabled'; end if;
-  -- The author of the clover being guessed must not give hints
-  if r.status = 'guessing' and not r.revealing and r.turn_order[r.current_turn + 1] = uid then
-    raise exception 'author_must_be_silent';
-  end if;
+  if r.status <> 'lobby' then raise exception 'wrong_phase'; end if;
   v_body := btrim(regexp_replace(coalesce(p_body, ''), '[[:space:]]+', ' ', 'g'));
   if char_length(v_body) not between 1 and 200 then raise exception 'invalid_message'; end if;
   if not _chat_is_kind(v_body) then raise exception 'chat_not_nice'; end if;
