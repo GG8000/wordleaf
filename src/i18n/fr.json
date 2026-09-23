@@ -53,6 +53,19 @@
       "L'auteur reste silencieux ! Les 4 justes du premier coup : 6 points. Sinon, les bonnes cartes restent, les autres reviennent, et un second essai rapporte 1 point par carte juste."
     ]
   },
+  "chat": {
+    "title": "Chat",
+    "offHost": "Laisse tout le monde discuter, dans le salon et pendant la partie. Seuls les messages gentils passent.",
+    "enable": "Activer",
+    "disable": "Désactiver le chat",
+    "empty": "Pas encore de messages. Dis bonjour ! 👋",
+    "placeholder": "Écris quelque chose de gentil…",
+    "close": "Fermer le chat",
+    "silent": "🤫 Chut, c'est ton trèfle",
+    "send": "Envoyer",
+    "delete": "Supprimer le message",
+    "niceHint": "🍀 Que des mots gentils : les insultes et les gros mots sont bloqués."
+  },
   "writing": {
     "shuffle": "🔀 Mélanger mes cartes",
     "shuffleHint": "Une fois par partie : tu reçois de nouvelles cartes et tes indices sont effacés.",
@@ -125,7 +138,13 @@
     "slot_locked": "Cette case est verrouillée.",
     "author_cannot_guess": "Chut ! C'est ton trèfle.",
     "wrong_phase": "La partie a avancé. Réessaie.",
-    "not_in_room": "Tu n'es plus à la table."
+    "not_in_room": "Tu n'es plus à la table.",
+    "chat_disabled": "Le chat est désactivé.",
+    "chat_not_nice": "Ce n'est pas très gentil. Essaie de le dire plus gentiment 🍀",
+    "chat_too_fast": "Doucement ! Réessaie dans quelques secondes.",
+    "invalid_message": "Les messages doivent faire entre 1 et 200 caractères.",
+    "author_must_be_silent": "Chut ! Tu ne peux pas écrire pendant qu'on devine ton trèfle.",
+    "not_allowed": "Tu ne peux pas faire ça."
   },
   "duel": {
     "create": "⚔️ Lancer un duel (asynchrone)",

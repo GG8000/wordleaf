@@ -126,6 +126,7 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - **Bot protection:** new players solve a Cloudflare Turnstile check before the anonymous sign-in, and Supabase Auth verifies the token. Players who already have a session never see it.
 - **Installable (PWA):** the app has a web app manifest and icons, so it can be added to the home screen on Android and iOS and opens full screen. There is no service worker, because the game needs a live connection anyway.
 - **Player map:** the 🌍 button in the footer opens a world map (Leaflet + OpenStreetMap tiles, no API key needed, loaded only when opened) with anonymous dots where people have played in the last year, across all rooms. Dots are colored by the most recent game there (playing now, last 7 days, earlier), sized by the number of players, and a legend with counts toggles each group. On joining, the browser looks up its rough location from its IP address at [GeoJS](https://www.geojs.io/) once per session; the server rounds it to 0.1° (about 10 km) and only hands out grouped counts per point, without names. "Now" means a heartbeat in the last 5 minutes. Locations not refreshed for a year are deleted.
+- **Chat** (off by default): the host turns it on in the lobby, and it stays on during the game. In the lobby it sits under the ready check; in the game a 💬 button in the corner opens it and shows how many new messages there are. Messages can be up to 200 characters. While a clover is being guessed, its author can't chat (the server rejects it with `author_must_be_silent`), just like they can't move cards. Only kind words get through: the server checks every message against a blocklist of insults, swear words and slurs in English, German and French and rejects it with a friendly hint. Before checking, it undoes the usual tricks (capitals, accents, `sh1t`, `f.u.c.k`, `f u c k`, `fuuuck`). Words only match as a whole or by their start, so `classic` or `Scheibe` are fine, and no card word is blocked. Players can delete their own messages and the host can delete any. A player can send 5 messages per 10 seconds, and a room keeps its last 100. The chat is cleared when the host turns it off and when the room empties. The list is the `chat_blocklist` table in `supabase/migrations/0012_chat.sql`.
 - **UI language** can be English, German or French. Each player picks it themselves with the switcher, and it is saved in the browser.
 - Game state syncs **in real time**, and online dots show who is connected (Supabase Presence).
 - **Leaving mid-game** is handled:
@@ -153,7 +154,6 @@ waiting ──join──► writing ──both submitted──► guessing ─�
 - Unanswered duels are deleted after 7 days, and any duel is deleted after 30 days without activity.
 
 ### Out of scope for now (see the roadmap)
-- In-game chat (use Discord or a call)
 - A writing timer
 - Persistent stats or history
 - Drag and drop
@@ -202,16 +202,18 @@ This keeps the game consistent, and hidden information stays on the server.
 
 | Table | Purpose | Client access |
 |-------|---------|---------------|
-| `words(lang, word)` | Word pool, about 450 words per language | none (RPC only) |
+| `words(lang, word)` | Word pool, about 570 words per language in themes (`category`) | none (RPC only) |
 | `rooms` | One per lobby (`id` = `'main'` or the share code), with all game state:<br>• `status`: lobby, writing, guessing or finished<br>• `card_lang`, `level`, `allow_shuffle`, `host_id`<br>• `turn_order`, `current_turn`<br>• `attempt`, `revealing`<br>• `guess_state` (jsonb `{cardId: {slot, rotation}}`)<br>• `locked_slots`, `score` | read `'main'` or own room |
 | `room_players` | Who is at the table (`name`, `joined_at`, `ready`) | read own room |
 | `heartbeats` | `last_seen` per player, used for the host timeout and stale-player cleanup. Kept separate so heartbeats don't trigger realtime refetches. | none |
 | `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed`, `shuffled` | read own room |
 | `cards` | 5 per clover:<br>• `words[4]` in the order top, right, bottom, left at rotation 0<br>• `tray_order` | read own room |
 | `solutions` | Secret `slot` (0 = TL, 1 = TR, 2 = BR, 3 = BL, null = decoy) and `rotation` (0–3 clockwise quarter turns) | read own or revealed (own room) |
+| `chat_messages` | Chat: `name`, `body` (1–200 characters), `created_at`; the last 100 per room | read own room |
+| `chat_blocklist` | Normalized `term`s the chat rejects; `prefix` also matches words starting with the term | none (RPC only) |
 | `player_locations` | Rounded `lat`/`lon` per user and when they last joined from there, for the player map | none (RPC only) |
 
-Realtime publishes changes to `rooms`, `room_players` and `clovers`; clients filter them by room. Clients refetch cards and solutions whenever the phase or turn changes.
+Realtime publishes changes to `rooms`, `room_players`, `clovers` and `chat_messages`; clients filter them by room. Clients refetch cards and solutions whenever the phase or turn changes.
 
 **Rotation maths:** the word shown on edge `e` of a card rotated `r` times is `words[(e − r) mod 4]`. This is implemented in `src/lib/clover.ts` and unit-tested.
 
@@ -229,6 +231,9 @@ Every game RPC takes an optional `p_room` (default `'main'`). The client sends t
 | `set_settings(p_card_lang, p_level, p_allow_shuffle?)` | host | In the lobby: store card language, level (1–3) and whether card shuffle is allowed. Clears everyone's ready. |
 | `shuffle_clover()` | player | Once per game while writing and before submitting: replace your 5 cards with new ones and clear your clues. |
 | `set_ready(p_ready)` | player | In the lobby: mark yourself ready or not. When all 2–10 players are ready, the game is dealt (5 cards × 4 unique words per player, secret slots, rotations and decoy) and moves to **writing**. |
+| `set_chat(p_enabled)` | host | Turn the chat on (in the lobby) or off (any time). Turning it off deletes the messages. Keeps ready flags. |
+| `send_chat(p_body)` | player | With chat on: post a message. Rejects unkind ones (`chat_not_nice`), more than 5 per 10 s (`chat_too_fast`) and the author of the clover being guessed (`author_must_be_silent`). |
+| `delete_chat(p_id)` | author or host | Delete a chat message. |
 | `heartbeat()` | player | Called every 20 s. Closes the lobby if the host has been silent for 2 minutes, and removes stale players or resets an abandoned game. |
 | `submit_clues(p_clues text[4])` | player | Validates single words. Once everyone has submitted, moves to **guessing**. |
 | `edit_clues()` | player | Take your submission back while still in writing. |
@@ -270,9 +275,10 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │   │   ├── toast.ts, types.ts
 │   ├── hooks/
 │   │   ├── useAuth.ts          # anonymous session
-│   │   └── useRoom.ts          # data, realtime, presence, optimistic patches
+│   │   ├── useRoom.ts          # data, realtime, presence, optimistic patches
+│   │   └── useChat.ts          # chat messages + realtime
 │   └── components/
-│       ├── Join, Lobby, WritingPhase, GuessingPhase, Results
+│       ├── Join, Lobby, Chat, WritingPhase, GuessingPhase, Results
 │       ├── Clover (board + leaves), CardView, PlayerList, LanguageSwitcher
 │       ├── PlayerMap           # footer map dialog (lazy-loaded Leaflet)
 │       └── WordleafLoader (+ .css)   # animated loading screen
@@ -289,7 +295,9 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0008_lobbies_and_map.sql  # private lobbies with codes, membership RLS, player map
 │       ├── 0009_map_history.sql      # map keeps past play locations
 │       ├── 0010_duels.sql            # asynchronous 1v1 duels + notifications outbox
-│       └── 0011_push.sql             # push subscriptions, trigger -> send-push
+│       ├── 0011_push.sql             # push subscriptions, trigger -> send-push
+│       ├── 0012_chat.sql             # chat + kindness blocklist
+│       └── 0013_more_words.sql       # ~120 more words per language in 6 new themes
 │   └── functions/send-push/    # Edge Function that sends Web Push (VAPID)
 └── scripts/
     ├── smoke-test.mjs          # full-game backend test
@@ -327,6 +335,7 @@ SUPABASE_SERVICE_KEY=<secret key from `npx supabase status`> npm run smoke:duel
 
 The smoke test resets the `main` room and plays through the game with 3 anonymous players. It checks:
 - host rules and input validation
+- the chat: host toggle, mean messages rejected, deleting, rate limit, silent author during guessing
 - RLS on solutions (no peeking, readable after the reveal)
 - the author cannot move cards
 - all three scoring paths (6, 4 via attempt 2, 0)
@@ -384,7 +393,6 @@ Do steps 4 and 5 together: with CAPTCHA protection on in Supabase but no site ke
 
 - An optional writing timer and a "hurry up" nudge
 - Drag and drop with animations, and a sound when cards lock
-- Text chat for guessers, hidden from the author
 - Persistent profiles: turn an anonymous user into an email account and keep stats
 - An "only one word" mode that blocks words that already appear on the board
 - A bigger and themed word list, plus custom word lists per room

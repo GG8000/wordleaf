@@ -7,6 +7,7 @@ import { Lobby } from './components/Lobby'
 import { DuelList } from './components/duel/DuelList'
 import { DuelView } from './components/duel/DuelView'
 import { Results } from './components/Results'
+import { FloatingChat } from './components/Chat'
 import { EffectsLayer } from './components/Effects'
 import { InstallApp } from './components/InstallApp'
 import { UpdateBanner } from './components/UpdateBanner'
@@ -197,9 +198,10 @@ export default function App() {
       )}
       {installOpen && <InstallApp onClose={() => setInstallOpen(false)} />}
       <EffectsLayer />
+      {!duelId && userId && me && room && room.status !== 'lobby' && <FloatingChat room={room} userId={userId} />}
       <UpdateBanner inGame={inRoom || inDuelRound} />
       {toast && (
-        <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
+        <div className="fixed inset-x-4 bottom-4 z-[1050] mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
           {toast}
         </div>
       )}

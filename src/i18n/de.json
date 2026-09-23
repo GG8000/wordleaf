@@ -53,6 +53,19 @@
       "Wer das Kleeblatt geschrieben hat, schweigt! Alle 4 im ersten Versuch richtig: 6 Punkte. Sonst bleiben die richtigen Karten liegen, der Rest geht zurück, und ein zweiter Versuch bringt 1 Punkt pro richtiger Karte."
     ]
   },
+  "chat": {
+    "title": "Chat",
+    "offHost": "Lass alle chatten, in der Lobby und während des Spiels. Nur freundliche Nachrichten kommen durch.",
+    "enable": "Einschalten",
+    "disable": "Chat ausschalten",
+    "empty": "Noch keine Nachrichten. Sag Hallo! 👋",
+    "placeholder": "Schreib etwas Nettes…",
+    "close": "Chat schließen",
+    "silent": "🤫 Psst, das ist dein Kleeblatt",
+    "send": "Senden",
+    "delete": "Nachricht löschen",
+    "niceHint": "🍀 Nur nette Worte: Beleidigungen und Schimpfwörter werden blockiert."
+  },
   "writing": {
     "shuffle": "🔀 Meine Karten mischen",
     "shuffleHint": "Einmal pro Spiel: Du bekommst neue Karten, deine Hinweise werden gelöscht.",
@@ -125,7 +138,13 @@
     "slot_locked": "Dieses Feld ist fixiert.",
     "author_cannot_guess": "Pssst! Das ist dein Kleeblatt.",
     "wrong_phase": "Das Spiel ist schon weiter. Bitte nochmal versuchen.",
-    "not_in_room": "Du sitzt nicht mehr am Tisch."
+    "not_in_room": "Du sitzt nicht mehr am Tisch.",
+    "chat_disabled": "Der Chat ist ausgeschaltet.",
+    "chat_not_nice": "Das klingt nicht sehr nett. Versuch es freundlicher 🍀",
+    "chat_too_fast": "Nicht so schnell. Versuch es in ein paar Sekunden noch mal.",
+    "invalid_message": "Nachrichten dürfen 1–200 Zeichen lang sein.",
+    "author_must_be_silent": "Psst! Solange dein Kleeblatt geraten wird, kannst du nicht chatten.",
+    "not_allowed": "Das darfst du nicht."
   },
   "duel": {
     "create": "⚔️ Duell starten (asynchron)",

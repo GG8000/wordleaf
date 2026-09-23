@@ -82,6 +82,34 @@ await expectError(B.client, 'set_settings', { p_card_lang: 'de', p_level: 2 }, '
 await expectError(A.client, 'join_room', { p_name: '   ' }, 'invalid_name')
 await call(A.client, 'set_settings', { p_card_lang: 'de', p_level: 2 })
 
+// Chat: host turns it on, only kind messages get through
+{
+  const chat = async (client) => (await client.from('chat_messages').select('id,body').eq('room_id', 'main').order('id')).data
+  await expectError(B.client, 'send_chat', { p_body: 'hi' }, 'chat_disabled')
+  await expectError(B.client, 'set_chat', { p_enabled: true }, 'not_host')
+  await call(B.client, 'set_ready', { p_ready: true })
+  await call(A.client, 'set_chat', { p_enabled: true })
+  const { data: ben } = await admin.from('room_players').select('ready').eq('user_id', B.id).single()
+  check(ben.ready, 'turning on the chat keeps ready flags')
+  await call(B.client, 'set_ready', { p_ready: false })
+
+  await call(B.client, 'send_chat', { p_body: 'Good luck, classic team! 🍀' })
+  for (const mean of ['you IDIOT', 'f u c k', 'sh1t', 'Fuuuuck', 'du Arschloch', 'ta gueule']) {
+    await expectError(C.client, 'send_chat', { p_body: mean }, 'chat_not_nice')
+  }
+  const msgs = await chat(C.client)
+  check(msgs.length === 1 && msgs[0].body === 'Good luck, classic team! 🍀', 'kind message stored, mean ones rejected')
+  await expectError(C.client, 'delete_chat', { p_id: msgs[0].id }, 'not_allowed')
+  await call(A.client, 'delete_chat', { p_id: msgs[0].id })
+  check((await chat(C.client)).length === 0, 'host can delete a message')
+
+  for (let i = 0; i < 5; i++) await call(C.client, 'send_chat', { p_body: `hello ${i}` })
+  await expectError(C.client, 'send_chat', { p_body: 'hello again' }, 'chat_too_fast')
+  await call(A.client, 'set_chat', { p_enabled: false })
+  check((await chat(A.client)).length === 0, 'turning the chat off clears it')
+  await call(A.client, 'set_chat', { p_enabled: true }) // stays on for the game
+}
+
 // Ready check: the game starts once the last player is ready
 async function allReady() {
   for (const p of players) await call(p.client, 'set_ready', { p_ready: true })
@@ -105,6 +133,7 @@ let r = await room()
 check(r.status === 'guessing' && r.turn_order.length === 3, 'all submitted -> guessing with 3 clovers')
 
 // Play one clover: `plan(solution, attempt)` returns placements for the 4 slots
+let chatChecked = false
 async function playTurn(plan, expectedPoints) {
   r = await room()
   const owner = byId[r.turn_order[r.current_turn]]
@@ -115,6 +144,11 @@ async function playTurn(plan, expectedPoints) {
   check(hidden.length === 0, `${guesser.name} cannot peek at ${owner.name}'s solution`)
   const anyCard = Object.keys(r.guess_state)[0]
   await expectError(owner.client, 'move_card', { p_card: anyCard, p_slot: 0, p_rotation: 0 }, 'author_cannot_guess')
+  if (!chatChecked) {
+    await expectError(owner.client, 'send_chat', { p_body: 'hint hint' }, 'author_must_be_silent')
+    await call(guesser.client, 'send_chat', { p_body: 'Nice clues!' })
+    chatChecked = true
+  }
 
   for (const attempt of [1, 2]) {
     r = await room()

@@ -4,6 +4,7 @@ import { inviteLink, PUBLIC_ROOM } from '../lib/room'
 import { rpc } from '../lib/rpc'
 import { showToast } from '../lib/toast'
 import type { Lang, Level } from '../lib/types'
+import { Chat } from './Chat'
 import { PlayerList } from './PlayerList'
 import type { GameProps } from './types'
 
@@ -90,6 +91,7 @@ export function Lobby({ room, players, userId, online }: GameProps) {
             {enoughPlayers ? t('lobby.readyHint') : t('lobby.needPlayers')}
           </p>
         </div>
+        <Chat room={room} userId={userId} />
         {!isHost && <p className="text-sm text-stone-500">{t('lobby.waitingHost', { name: host?.name ?? '…' })}</p>}
         <p className="text-xs text-stone-400">{t('lobby.hostTimeout')}</p>
       </section>

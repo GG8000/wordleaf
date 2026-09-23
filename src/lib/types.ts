@@ -14,6 +14,7 @@ export interface Room {
   card_lang: Lang
   level: Level
   allow_shuffle: boolean
+  allow_chat: boolean
   turn_order: string[]
   current_turn: number
   attempt: number
@@ -53,6 +54,14 @@ export interface Solution {
   owner_id: string
   slot: number | null
   rotation: number
+}
+
+export interface ChatMessage {
+  id: number
+  user_id: string
+  name: string
+  body: string
+  created_at: string
 }
 
 export interface MapPoint {
