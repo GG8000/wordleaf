@@ -8,7 +8,9 @@
     "join": "Join the table",
     "joining": "Joining…",
     "inProgress": "A game is running right now. You can join once it is over.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "captchaFailed": "The security check didn't work. Please wait for the new check and try again.",
+    "captchaBlocked": "The security check couldn't load. Turn off content blockers for this site or reload the page."
   },
   "lobby": {
     "shuffle": "Card shuffle",
@@ -107,5 +109,6 @@
     "wrong_phase": "The game has moved on. Please try again.",
     "not_in_room": "You are not at the table anymore."
   },
+  "loader": { "label": "Loading…", "messages": ["Picking fresh word pairs…", "Untangling brain wrinkles…", "Justifying bold associations…", "Bringing the leaves into line…"], "words": {"a": "Volcano", "b": "Chocolate", "c": "Police", "clue1": "Lava cake", "clue2": "Bribery?!"} },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }

@@ -8,7 +8,9 @@
     "join": "Rejoindre la table",
     "joining": "Connexion…",
     "inProgress": "Une partie est en cours. Tu pourras rejoindre à la fin.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "captchaFailed": "La vérification de sécurité a échoué. Attends la nouvelle vérification et réessaie.",
+    "captchaBlocked": "La vérification de sécurité n'a pas pu se charger. Désactive les bloqueurs de contenu pour ce site ou recharge la page."
   },
   "lobby": {
     "shuffle": "Mélanger les cartes",
@@ -107,5 +109,6 @@
     "wrong_phase": "La partie a avancé. Réessaie.",
     "not_in_room": "Tu n'es plus à la table."
   },
+  "loader": { "label": "Chargement…", "messages": ["Cueillette de nouvelles paires de mots…", "Démêlage des neurones…", "Justification d'associations audacieuses…", "Mise en harmonie des feuilles…"], "words": {"a": "Volcan", "b": "Chocolat", "c": "Police", "clue1": "Coulant", "clue2": "Pot-de-vin ?!"} },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }

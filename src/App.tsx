@@ -6,6 +6,7 @@ import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { Lobby } from './components/Lobby'
 import { Results } from './components/Results'
 import { EffectsLayer } from './components/Effects'
+import { LOADER_LOOP_MS, WordleafLoader } from './components/WordleafLoader'
 import { WritingPhase } from './components/WritingPhase'
 import { useAuth } from './hooks/useAuth'
 import { useRoom } from './hooks/useRoom'
@@ -47,13 +48,20 @@ export default function App() {
     if (!inRoom) leaving.current = false
   }, [inRoom, room, players.length])
 
+  // Play the loading animation once in full on startup, even if the data is there sooner
+  const [introDone, setIntroDone] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
+  useEffect(() => {
+    const id = setTimeout(() => setIntroDone(true), LOADER_LOOP_MS)
+    return () => clearTimeout(id)
+  }, [])
+
   let content
   if (!isConfigured) {
     content = <p className="mx-auto mt-10 max-w-md rounded-xl bg-rose-100 p-4 text-rose-900">{t('config.missing')}</p>
-  } else if (!ready || (userId && !loaded)) {
-    content = <div className="mt-20 animate-pulse text-center text-5xl">🍀</div>
+  } else if (!introDone || !ready || (userId && !loaded)) {
+    content = <div className="mt-10"><WordleafLoader /></div>
   } else if (!userId || !me || !room) {
-    content = <Join ensureSession={ensureSession} onJoined={refetch} status={room?.status} />
+    content = <Join ensureSession={ensureSession} hasSession={Boolean(userId)} onJoined={refetch} status={room?.status} />
   } else {
     const props = { ...roomData, room, userId }
     content = {

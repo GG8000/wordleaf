@@ -92,6 +92,9 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - **Ready check:** every player clicks **Ready**, and the game starts automatically as soon as all players in the lobby are ready (2–10 players). Changing a setting clears everyone's ready. If the last player who isn't ready leaves, the game starts too.
 - **Host timeout:** every client sends a heartbeat every 20 s. If the host sends none for **2 minutes** while the room is in the lobby, the room is closed: everyone is removed and sees a notice, and the next person to join becomes host of a fresh room.
 - **Stale players:** in the lobby, other players who have been silent for 2 minutes are removed, so they can't hold up the ready check. During a game, a player silent for **5 minutes** is removed as if they had left. If **nobody** in a running game has sent a heartbeat for 2 minutes, the game counts as abandoned and the room is reset, so the next person can join. These checks run on every heartbeat and every join.
+- **Loading screen:** on startup, a short animated story plays once in full (8 s): a pencil links words on a clover, the board turns and the next pair gets awkward. It's `WordleafLoader`, pure CSS and SVG. With reduced motion, the app skips the wait.
+- **Bot protection:** new players solve a Cloudflare Turnstile check before the anonymous sign-in, and Supabase Auth verifies the token. Players who already have a session never see it.
+- **Installable (PWA):** the app has a web app manifest and icons, so it can be added to the home screen on Android and iOS and opens full screen. There is no service worker, because the game needs a live connection anyway.
 - **UI language** can be English, German or French. Each player picks it themselves with the switcher, and it is saved in the browser.
 - Game state syncs **in real time**, and online dots show who is connected (Supabase Presence).
 - **Leaving mid-game** is handled:
@@ -202,7 +205,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 ## 6. Project structure
 
 ```
-├── index.html
+├── index.html                  # PWA meta tags
+├── public/                     # icon.svg (source), PNG icons, manifest.webmanifest
 ├── src/
 │   ├── App.tsx                 # routes by room.status, header, toast
 │   ├── i18n/                   # en.json, de.json, fr.json, init
@@ -217,6 +221,7 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │   └── components/
 │       ├── Join, Lobby, WritingPhase, GuessingPhase, Results
 │       ├── Clover (board + leaves), CardView, PlayerList, LanguageSwitcher
+│       └── WordleafLoader (+ .css)   # animated loading screen
 ├── supabase/
 │   ├── config.toml             # anonymous sign-ins enabled
 │   └── migrations/
@@ -227,7 +232,9 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0005_ready_and_heartbeat.sql  # ready check + host timeout
 │       ├── 0006_shuffle.sql    # card shuffle
 │       └── 0007_stale_players.sql  # remove silent players, reset abandoned games
-└── scripts/smoke-test.mjs      # full-game backend test
+└── scripts/
+    ├── smoke-test.mjs          # full-game backend test
+    └── make-icons.sh           # renders the PNG icons from public/icon.svg (needs rsvg-convert)
 ```
 
 ---
@@ -242,6 +249,8 @@ npx supabase start          # applies migrations; prints API URL and keys
 cp .env.example .env        # put the API URL and the publishable/anon key here
 npm run dev                 # http://localhost:5173
 ```
+
+Locally, the captcha uses Cloudflare's public test keys (site key in `.env.example`, secret in `supabase/config.toml`), which always pass. If you started Supabase before the captcha was added, run `npx supabase stop && npx supabase start` so Auth picks up the setting.
 
 **Testing multiplayer alone:** open `http://localhost:5173/?p=1`, `?p=2` and `?p=3` in separate tabs. Each `p` value uses its own session, so each tab is a different player. A private window also works.
 
@@ -275,13 +284,16 @@ The smoke test resets the `main` room and plays through the game with 3 anonymou
    npx supabase link --project-ref <your-ref>
    npx supabase db push
    ```
-4. Deploy the frontend to Vercel or Netlify:
+4. Set up the captcha:
+   - In the Cloudflare dashboard, go to **Turnstile → Add widget**, add your site's hostname and pick the **Managed** mode. You get a site key and a secret key.
+   - In Supabase, go to **Authentication → Attack Protection**, turn on **CAPTCHA protection**, pick **Turnstile** and paste the **secret** key.
+5. Deploy the frontend to Vercel or Netlify:
    - build command `npm run build`
    - output directory `dist`
-   - env vars `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the publishable key)
-5. Share the URL with your friends. 🍀
+   - env vars `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (the publishable key) and `VITE_TURNSTILE_SITE_KEY` (the Turnstile **site** key)
+6. Share the URL with your friends. 🍀
 
-Optional: add CAPTCHA protection for anonymous sign-ins (Auth → Bot and Abuse Protection) if the URL becomes public.
+Do steps 4 and 5 together: with CAPTCHA protection on in Supabase but no site key in the frontend, nobody new can sign in.
 
 ---
 

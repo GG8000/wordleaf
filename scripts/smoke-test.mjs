@@ -59,7 +59,8 @@ const names = ['Ana', 'Ben', 'Cleo']
 const players = []
 for (const name of names) {
   const client = createClient(API_URL, ANON, opts)
-  const { data, error } = await client.auth.signInAnonymously()
+  // Cloudflare's test secret (supabase/config.toml) accepts this dummy Turnstile token
+  const { data, error } = await client.auth.signInAnonymously({ options: { captchaToken: 'XXXX.DUMMY.TOKEN.XXXX' } })
   if (error) throw error
   players.push({ name, client, id: data.user.id })
 }

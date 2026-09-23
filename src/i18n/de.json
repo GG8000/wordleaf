@@ -8,7 +8,9 @@
     "join": "An den Tisch setzen",
     "joining": "Beitreten…",
     "inProgress": "Gerade läuft eine Partie. Du kannst beitreten, sobald sie vorbei ist.",
-    "retry": "Nochmal versuchen"
+    "retry": "Nochmal versuchen",
+    "captchaFailed": "Die Sicherheitsprüfung hat nicht geklappt. Bitte warte auf die neue Prüfung und versuch es nochmal.",
+    "captchaBlocked": "Die Sicherheitsprüfung konnte nicht geladen werden. Schalte Inhaltsblocker für diese Seite aus oder lade die Seite neu."
   },
   "lobby": {
     "shuffle": "Karten mischen",
@@ -107,5 +109,6 @@
     "wrong_phase": "Das Spiel ist schon weiter. Bitte nochmal versuchen.",
     "not_in_room": "Du sitzt nicht mehr am Tisch."
   },
+  "loader": { "label": "Lädt…", "messages": ["Pflücke neue Wortkombinationen…", "Entwirre Gehirnwindungen…", "Begründe gewagte Assoziationen…", "Bring die Blätter in Einklang…"], "words": {"a": "Vulkan", "b": "Schokolade", "c": "Polizei", "clue1": "Lava-Kuchen", "clue2": "Bestechung?!"} },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }

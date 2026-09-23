@@ -16,10 +16,10 @@ export function useAuth() {
   }, [])
 
   /** Anonymous sign-in on first join; reuses the stored session afterwards */
-  const ensureSession = useCallback(async () => {
+  const ensureSession = useCallback(async (captchaToken?: string) => {
     const { data } = await supabase.auth.getSession()
     if (data.session) return data.session
-    const res = await supabase.auth.signInAnonymously()
+    const res = await supabase.auth.signInAnonymously({ options: { captchaToken } })
     if (res.error) throw res.error
     return res.data.session
   }, [])
