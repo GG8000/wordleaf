@@ -6,10 +6,12 @@ import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { Lobby } from './components/Lobby'
 import { Results } from './components/Results'
 import { EffectsLayer } from './components/Effects'
+import { InstallApp } from './components/InstallApp'
 import { LOADER_LOOP_MS, WordleafLoader } from './components/WordleafLoader'
 import { WritingPhase } from './components/WritingPhase'
 import { useAuth } from './hooks/useAuth'
 import { useRoom } from './hooks/useRoom'
+import { useInstall } from './lib/install'
 import { PUBLIC_ROOM, setRoomId, useRoomId } from './lib/room'
 import { rpc } from './lib/rpc'
 import { isConfigured, supabase } from './lib/supabase'
@@ -42,6 +44,8 @@ export default function App() {
   }, [inRoom, roomId])
 
   const [mapOpen, setMapOpen] = useState(false)
+  const [installOpen, setInstallOpen] = useState(false)
+  const { installed } = useInstall()
 
   // Tell players why they are suddenly back at the join screen
   const [spins, setSpins] = useState(0)
@@ -131,13 +135,24 @@ export default function App() {
         {content}
       </main>
       <footer className="mx-auto mt-12 flex max-w-xl flex-col items-center gap-3 text-center text-xs text-stone-500">
-        <button
-          type="button"
-          onClick={() => setMapOpen(true)}
-          className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-leaf-800 shadow-sm hover:bg-leaf-50"
-        >
-          🌍 {t('map.open')}
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMapOpen(true)}
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-leaf-800 shadow-sm hover:bg-leaf-50"
+          >
+            🌍 {t('map.open')}
+          </button>
+          {!installed && (
+            <button
+              type="button"
+              onClick={() => setInstallOpen(true)}
+              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-leaf-800 shadow-sm hover:bg-leaf-50"
+            >
+              📲 {t('install.open')}
+            </button>
+          )}
+        </div>
         <p>{t('app.credit')}</p>
       </footer>
       {mapOpen && (
@@ -145,6 +160,7 @@ export default function App() {
           <PlayerMap onClose={() => setMapOpen(false)} />
         </Suspense>
       )}
+      {installOpen && <InstallApp onClose={() => setInstallOpen(false)} />}
       <EffectsLayer />
       {toast && (
         <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">

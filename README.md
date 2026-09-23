@@ -12,6 +12,31 @@ Wordleaf is an unofficial fan project **inspired by the board game *So Clover!**
 - The name, code, visual design, rules text and word list are original. No artwork, card text or rules text from the published game are used.
 - It's meant for private, non-commercial play.
 
+## Install it as an app (Android & iOS)
+
+Wordleaf is a Progressive Web App (PWA), so you can add it to your home screen. It then opens full screen, without the browser bar, and gets its own 🍀 icon. There's no app store and nothing to download. Game data still comes from the server, so you need an internet connection to play.
+
+The easiest way is the **📲 Install app** button at the bottom of the page. Where the browser supports it (Chrome, Edge, Samsung Internet), it opens the install dialog right away. Otherwise it shows the steps below for your phone. The button is hidden when Wordleaf is already running as an installed app.
+
+**Android (Chrome)**
+1. Open the Wordleaf URL in Chrome.
+2. Tap the **⋮** menu in the top-right corner.
+3. Tap **Install app** (on some phones it's called **Add to Home screen**) and confirm with **Install**.
+4. Open Wordleaf from your home screen or app drawer.
+
+Samsung Internet, Edge and Firefox work the same way: find **Add to Home screen** or **Install** in the browser menu.
+
+**iPhone & iPad (Safari)**
+1. Open the Wordleaf URL in **Safari**. On iOS 16.3 and older, only Safari can add web apps to the home screen.
+2. Tap the **Share** button (the square with an arrow pointing up). It's at the bottom of the screen on iPhone and at the top on iPad.
+3. Scroll down and tap **Add to Home Screen**. If you don't see it, tap **Edit Actions…** and add it.
+4. Leave **Open as Web App** turned on (iOS 26 and newer), then tap **Add**.
+5. Open Wordleaf from your home screen.
+
+To remove the app, long-press its icon and choose **Uninstall** (Android) or **Delete Bookmark** / **Remove App** (iOS).
+
+> **For self-hosters:** installing only works over **HTTPS** (or on `localhost`). The PWA setup is `public/manifest.webmanifest`, the icons in `public/` (you can regenerate them with `scripts/make-icons.sh`) and the `apple-*` meta tags in `index.html`. If you change the name or colors, update both places.
+
 ---
 
 ## 1. Game rules (as implemented)
