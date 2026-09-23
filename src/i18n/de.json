@@ -122,6 +122,6 @@
     "not_in_room": "Du sitzt nicht mehr am Tisch."
   },
   "loader": { "label": "Lädt…", "messages": ["Pflücke neue Wortkombinationen…", "Entwirre Gehirnwindungen…", "Begründe gewagte Assoziationen…", "Bring die Blätter in Einklang…"], "words": {"a": "Vulkan", "b": "Schokolade", "c": "Polizei", "clue1": "Lava-Kuchen", "clue2": "Bestechung?!"} },
-  "map": { "open": "Wo gespielt wird", "title": "Wer gerade spielt", "close": "Schließen", "players_one": "{{count}} Person", "players_other": "{{count}} Personen", "count_one": "Gerade spielt {{count}} Person", "count_other": "Gerade spielen {{count}} Personen", "note": "Die Orte sind ungefähr (aus der IP-Adresse, auf etwa 10 km gerundet) und anonym." },
+  "map": { "open": "Wo gespielt wird", "title": "Wo gespielt wird", "close": "Schließen", "legend": "Legende", "legend_now": "Spielt gerade", "legend_week": "Letzte 7 Tage", "legend_earlier": "Früher", "tipNow_one": "{{count}} spielt gerade", "tipNow_other": "{{count}} spielen gerade", "tipWeek_one": "{{count}} in den letzten 7 Tagen", "tipWeek_other": "{{count}} in den letzten 7 Tagen", "tipTotal_one": "{{count}} Person insgesamt", "tipTotal_other": "{{count}} Personen insgesamt", "note": "Jeder Punkt ist ein Ort, an dem im letzten Jahr gespielt wurde, gefärbt nach dem letzten Spiel dort. Die Orte sind ungefähr (aus der IP-Adresse, auf etwa 10 km gerundet) und anonym. Tippe auf die Legende, um eine Gruppe ein- oder auszublenden." },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }

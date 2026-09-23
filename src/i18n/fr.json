@@ -122,6 +122,6 @@
     "not_in_room": "Tu n'es plus à la table."
   },
   "loader": { "label": "Chargement…", "messages": ["Cueillette de nouvelles paires de mots…", "Démêlage des neurones…", "Justification d'associations audacieuses…", "Mise en harmonie des feuilles…"], "words": {"a": "Volcan", "b": "Chocolat", "c": "Police", "clue1": "Coulant", "clue2": "Pot-de-vin ?!"} },
-  "map": { "open": "Où l'on joue", "title": "Qui joue en ce moment", "close": "Fermer", "players_one": "{{count}} joueur", "players_other": "{{count}} joueurs", "count_one": "{{count}} personne joue en ce moment", "count_other": "{{count}} personnes jouent en ce moment", "note": "Les lieux sont approximatifs (d'après l'adresse IP, arrondis à environ 10 km) et anonymes." },
+  "map": { "open": "Où l'on joue", "title": "Où l'on joue", "close": "Fermer", "legend": "Légende", "legend_now": "Joue en ce moment", "legend_week": "7 derniers jours", "legend_earlier": "Avant", "tipNow_one": "{{count}} joue en ce moment", "tipNow_other": "{{count}} jouent en ce moment", "tipWeek_one": "{{count}} ces 7 derniers jours", "tipWeek_other": "{{count}} ces 7 derniers jours", "tipTotal_one": "{{count}} joueur au total", "tipTotal_other": "{{count}} joueurs au total", "note": "Chaque point est un lieu où l'on a joué au cours de l'année, coloré selon la dernière partie. Les lieux sont approximatifs (d'après l'adresse IP, arrondis à environ 10 km) et anonymes. Touche la légende pour afficher ou masquer un groupe." },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }

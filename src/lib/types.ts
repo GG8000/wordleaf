@@ -58,5 +58,8 @@ export interface Solution {
 export interface MapPoint {
   lat: number
   lon: number
-  players: number
+  players_now: number
+  /** Played here in the last 7 days, including now */
+  players_week: number
+  players_total: number
 }

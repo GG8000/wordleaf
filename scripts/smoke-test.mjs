@@ -224,14 +224,17 @@ check(r.status === 'lobby' && r.host_id === null, 'empty room resets to lobby')
 
   // Map: rounded, and only players with a recent heartbeat
   await call(B.client, 'set_location', { p_lat: 47.8095, p_lon: 13.055 })
-  const { data: points } = await C.client.rpc('player_map')
-  check(points?.some((p) => Math.abs(p.lat - 47.8) < 1e-4 && Math.abs(p.lon - 13.1) < 1e-4), 'player_map shows the rounded location')
+  const spot = (pts) => pts?.find((p) => Math.abs(p.lat - 47.8) < 1e-4 && Math.abs(p.lon - 13.1) < 1e-4)
+  const live = spot((await C.client.rpc('player_map')).data)
+  check(live?.players_now >= 1 && live.players_week >= 1 && live.players_total >= 1, 'player_map shows the rounded location as live')
   const { data: anonPoints, error: anonError } = await createClient(API_URL, ANON, opts).rpc('player_map')
   check(!anonError && Array.isArray(anonPoints), 'player_map works without signing in')
   await expectError(B.client, 'set_location', { p_lat: 123, p_lon: 0 }, 'invalid_location')
 
   await A.client.rpc('leave_room', { p_room: code })
   await B.client.rpc('leave_room')
+  const past = spot((await C.client.rpc('player_map')).data)
+  check(past && past.players_now === live.players_now - 1 && past.players_total === live.players_total, 'after leaving, the spot stays on the map as past')
   await admin.from('player_locations').delete().eq('user_id', B.id)
   await admin.from('rooms').delete().eq('id', code)
 }

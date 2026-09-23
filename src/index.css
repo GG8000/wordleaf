@@ -99,7 +99,11 @@ body {
 .fx-banner { animation: banner 2.2s ease-out forwards; }
 .fx-splash { animation: splash 1.4s ease-out forwards; }
 
+/* Player map: live spots breathe (SVG path, so animate the stroke instead of scaling) */
+@keyframes map-live { 50% { stroke-width: 7px; stroke-opacity: 0.35; } }
+.map-live { animation: map-live 2s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  [class*='anim-'], .fx-banner, .fx-splash { animation: none !important; }
+  [class*='anim-'], .fx-banner, .fx-splash, .map-live { animation: none !important; }
   .fx-motion { display: none; }
 }

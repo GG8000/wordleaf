@@ -98,7 +98,7 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - **Loading screen:** on startup, a short animated story plays once in full (8 s): a pencil links words on a clover, the board turns and the next pair gets awkward. It's `WordleafLoader`, pure CSS and SVG. With reduced motion, the app skips the wait.
 - **Bot protection:** new players solve a Cloudflare Turnstile check before the anonymous sign-in, and Supabase Auth verifies the token. Players who already have a session never see it.
 - **Installable (PWA):** the app has a web app manifest and icons, so it can be added to the home screen on Android and iOS and opens full screen. There is no service worker, because the game needs a live connection anyway.
-- **Player map:** the 🌍 button in the footer opens a world map (Leaflet + OpenStreetMap tiles, no API key needed, loaded only when opened) with anonymous dots where people are playing right now, across all rooms. On joining, the browser looks up its rough location from its IP address at [GeoJS](https://www.geojs.io/) once per session; the server rounds it to 0.1° (about 10 km) and only hands out points of players with a heartbeat in the last 5 minutes, grouped, without names. Locations older than 7 days are deleted.
+- **Player map:** the 🌍 button in the footer opens a world map (Leaflet + OpenStreetMap tiles, no API key needed, loaded only when opened) with anonymous dots where people have played in the last year, across all rooms. Dots are colored by the most recent game there (playing now, last 7 days, earlier), sized by the number of players, and a legend with counts toggles each group. On joining, the browser looks up its rough location from its IP address at [GeoJS](https://www.geojs.io/) once per session; the server rounds it to 0.1° (about 10 km) and only hands out grouped counts per point, without names. "Now" means a heartbeat in the last 5 minutes. Locations not refreshed for a year are deleted.
 - **UI language** can be English, German or French. Each player picks it themselves with the switcher, and it is saved in the browser.
 - Game state syncs **in real time**, and online dots show who is connected (Supabase Presence).
 - **Leaving mid-game** is handled:
@@ -166,7 +166,7 @@ This keeps the game consistent, and hidden information stays on the server.
 | `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed`, `shuffled` | read own room |
 | `cards` | 5 per clover:<br>• `words[4]` in the order top, right, bottom, left at rotation 0<br>• `tray_order` | read own room |
 | `solutions` | Secret `slot` (0 = TL, 1 = TR, 2 = BR, 3 = BL, null = decoy) and `rotation` (0–3 clockwise quarter turns) | read own or revealed (own room) |
-| `player_locations` | Rounded `lat`/`lon` per user for the player map | none (RPC only) |
+| `player_locations` | Rounded `lat`/`lon` per user and when they last joined from there, for the player map | none (RPC only) |
 
 Realtime publishes changes to `rooms`, `room_players` and `clovers`; clients filter them by room. Clients refetch cards and solutions whenever the phase or turn changes.
 
@@ -195,7 +195,7 @@ Every game RPC takes an optional `p_room` (default `'main'`). The client sends t
 | `next_clover()` | player | After a reveal, move to the next clover or to **finished**. |
 | `back_to_lobby()` | host | Reset to the lobby and clear all ready flags ("Play again"). |
 | `set_location(p_lat, p_lon)` | anyone signed in | Store your rough location for the map (rounded to 0.1°). No `p_room`. |
-| `player_map()` | anyone, even signed out | Points `(lat, lon, players)` of everyone with a recent heartbeat. No `p_room`. |
+| `player_map()` | anyone, even signed out | Per rounded point: `players_now`, `players_week` (incl. now) and `players_total`. No `p_room`. |
 
 Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`, `author_cannot_guess`), and the UI translates them in `errors.*`.
 
@@ -243,7 +243,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0005_ready_and_heartbeat.sql  # ready check + host timeout
 │       ├── 0006_shuffle.sql    # card shuffle
 │       ├── 0007_stale_players.sql  # remove silent players, reset abandoned games
-│       └── 0008_lobbies_and_map.sql  # private lobbies with codes, membership RLS, player map
+│       ├── 0008_lobbies_and_map.sql  # private lobbies with codes, membership RLS, player map
+│       └── 0009_map_history.sql      # map keeps past play locations
 └── scripts/
     ├── smoke-test.mjs          # full-game backend test
     └── make-icons.sh           # renders the PNG icons from public/icon.svg (needs rsvg-convert)
@@ -285,7 +286,7 @@ The smoke test resets the `main` room and plays through the game with 3 anonymou
 - leaving mid-game and passing on the host role
 - realtime delivery
 - private lobbies: codes, membership RLS, `room_not_found`, one room per player
-- the player map: rounding, validation, access without signing in
+- the player map: rounding, live vs past, validation, access without signing in
 
 ---
 

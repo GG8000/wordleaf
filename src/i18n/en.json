@@ -122,6 +122,6 @@
     "not_in_room": "You are not at the table anymore."
   },
   "loader": { "label": "Loading…", "messages": ["Picking fresh word pairs…", "Untangling brain wrinkles…", "Justifying bold associations…", "Bringing the leaves into line…"], "words": {"a": "Volcano", "b": "Chocolate", "c": "Police", "clue1": "Lava cake", "clue2": "Bribery?!"} },
-  "map": { "open": "Where people are playing", "title": "Who's playing right now", "close": "Close", "players_one": "{{count}} player", "players_other": "{{count}} players", "count_one": "{{count}} person is playing right now", "count_other": "{{count}} people are playing right now", "note": "Locations are approximate (from the IP address, rounded to about 10 km) and anonymous." },
+  "map": { "open": "Where people play", "title": "Where people play", "close": "Close", "legend": "Legend", "legend_now": "Playing now", "legend_week": "Last 7 days", "legend_earlier": "Earlier", "tipNow_one": "{{count}} playing now", "tipNow_other": "{{count}} playing now", "tipWeek_one": "{{count}} in the last 7 days", "tipWeek_other": "{{count}} in the last 7 days", "tipTotal_one": "{{count}} player in total", "tipTotal_other": "{{count}} players in total", "note": "Each dot is a place where people have played in the last year, colored by the most recent game there. Locations are approximate (from the IP address, rounded to about 10 km) and anonymous. Tap the legend to show or hide a group." },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }
