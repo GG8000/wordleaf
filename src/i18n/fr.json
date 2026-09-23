@@ -20,7 +20,13 @@
       { "name": "Moyen", "desc": "Mots aléatoires, mais chaque mot de la carte leurre partage un thème avec un mot près d’une feuille (comme Lion et Tigre). Elle semble donc à sa place." },
       { "name": "Difficile", "desc": "Tout le trèfle et la carte leurre viennent d’environ trois thèmes (comme les animaux, la nourriture et la météo). Les indices doivent être précis, et chaque carte semble pouvoir aller partout." }
     ],
-    "start": "Lancer la partie",
+    "ready": "Je suis prêt·e",
+    "unready": "Pas encore prêt·e",
+    "readyCount": "{{ready}} sur {{total}} prêt·es",
+    "readyHint": "La partie commence dès que tout le monde est prêt.",
+    "settingsHint": "Modifier un réglage oblige tout le monde à se remettre prêt.",
+    "hostTimeout": "Si l’hôte ne répond pas pendant 2 minutes, le salon est fermé.",
+    "closed": "Le salon a été fermé car l’hôte n’a pas répondu pendant 2 minutes. Rejoins-le pour en ouvrir un nouveau.",
     "needPlayers": "Il faut 2 à 10 joueurs pour commencer.",
     "waitingHost": "En attente que {{name}} lance la partie…",
     "kick": "Retirer",
@@ -66,7 +72,6 @@
     "title": "Fin de partie",
     "score": "Score d'équipe : {{score}} / {{max}}",
     "tiers": ["Feuilles fanées… on recommence !", "Une petite pousse.", "Ça pousse bien !", "Un trèfle porte-bonheur !", "Légendes à quatre feuilles !"],
-    "backToLobby": "Retour au salon",
     "newGame": "Rejouer",
     "left": "parti"
   },

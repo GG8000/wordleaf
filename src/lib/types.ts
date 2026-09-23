@@ -27,6 +27,7 @@ export interface Player {
   user_id: string
   name: string
   joined_at: string
+  ready: boolean
 }
 
 export interface Clover {

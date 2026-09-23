@@ -36,7 +36,7 @@ export function useRoom(userId: string | null) {
     const id = ++seq.current
     const [r, p, c, k, s] = await Promise.all([
       supabase.from('rooms').select('*').eq('id', ROOM_ID).single(),
-      supabase.from('room_players').select('user_id,name,joined_at').eq('room_id', ROOM_ID).order('joined_at'),
+      supabase.from('room_players').select('user_id,name,joined_at,ready').eq('room_id', ROOM_ID).order('joined_at'),
       supabase.from('clovers').select('owner_id,owner_name,clues,submitted,points,revealed').eq('room_id', ROOM_ID),
       supabase.from('cards').select('id,owner_id,words,tray_order').eq('room_id', ROOM_ID).order('tray_order'),
       supabase.from('solutions').select('card_id,owner_id,slot,rotation').eq('room_id', ROOM_ID),

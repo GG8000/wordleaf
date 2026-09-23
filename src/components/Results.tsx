@@ -31,22 +31,14 @@ export function Results({ room, clovers, players, userId }: GameProps) {
         ))}
       </ul>
       {isHost ? (
-        <div className="flex justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => rpc('start_game', { p_card_lang: room.card_lang }).catch(() => {})}
-            className="rounded-xl bg-leaf-600 px-5 py-3 font-bold text-white hover:bg-leaf-700"
-          >
-            {t('results.newGame')}
-          </button>
-          <button
-            type="button"
-            onClick={() => rpc('back_to_lobby').catch(() => {})}
-            className="rounded-xl border border-leaf-600 px-5 py-3 font-semibold text-leaf-700 hover:bg-leaf-50"
-          >
-            {t('results.backToLobby')}
-          </button>
-        </div>
+        // Everyone confirms again with the ready check in the lobby
+        <button
+          type="button"
+          onClick={() => rpc('back_to_lobby').catch(() => {})}
+          className="mx-auto rounded-xl bg-leaf-600 px-5 py-3 font-bold text-white hover:bg-leaf-700"
+        >
+          {t('results.newGame')}
+        </button>
       ) : (
         <p className="text-stone-600">{t('lobby.waitingHost', { name: host?.name ?? '…' })}</p>
       )}

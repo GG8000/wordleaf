@@ -20,7 +20,13 @@
       { "name": "Mittel", "desc": "Zufällige Wörter, aber jedes Wort der Täuschkarte teilt ein Thema mit einem Wort an einem Blatt (wie Löwe und Tiger). Sie wirkt also, als gehöre sie dazu." },
       { "name": "Schwer", "desc": "Das ganze Kleeblatt und die Täuschkarte stammen aus etwa drei Themen (wie Tiere, Essen und Wetter). Hinweise müssen genau sein, und jede Karte scheint überall zu passen." }
     ],
-    "start": "Spiel starten",
+    "ready": "Bereit",
+    "unready": "Doch nicht bereit",
+    "readyCount": "{{ready}} von {{total}} bereit",
+    "readyHint": "Das Spiel startet, sobald alle bereit sind.",
+    "settingsHint": "Wenn du eine Einstellung änderst, müssen alle erneut auf Bereit klicken.",
+    "hostTimeout": "Reagiert der Host 2 Minuten lang nicht, wird der Raum geschlossen.",
+    "closed": "Der Raum wurde geschlossen, weil der Host 2 Minuten lang nicht reagiert hat. Tritt erneut bei, um einen neuen zu öffnen.",
     "needPlayers": "Zum Starten braucht ihr 2 bis 10 Spieler:innen.",
     "waitingHost": "Warte darauf, dass {{name}} das Spiel startet…",
     "kick": "Entfernen",
@@ -66,7 +72,6 @@
     "title": "Spielende",
     "score": "Teampunkte: {{score}} / {{max}}",
     "tiers": ["Verwelkte Blätter… nochmal!", "Ein kleiner Keimling.", "Das wächst schön!", "Ein Glücksklee!", "Vierblättrige Legenden!"],
-    "backToLobby": "Zurück zur Lobby",
     "newGame": "Nochmal spielen",
     "left": "gegangen"
   },

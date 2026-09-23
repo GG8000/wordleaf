@@ -77,12 +77,21 @@ await sleep(1500) // postgres_changes needs a moment after SUBSCRIBED
 // Lobby
 for (const p of players) await call(p.client, 'join_room', { p_name: p.name })
 check((await room()).host_id === A.id, 'first player becomes host')
-await expectError(B.client, 'start_game', { p_card_lang: 'de' }, 'not_host')
+await expectError(B.client, 'set_settings', { p_card_lang: 'de', p_level: 2 }, 'not_host')
 await expectError(A.client, 'join_room', { p_name: '   ' }, 'invalid_name')
+await call(A.client, 'set_settings', { p_card_lang: 'de', p_level: 2 })
+
+// Ready check: the game starts once the last player is ready
+async function allReady() {
+  for (const p of players) await call(p.client, 'set_ready', { p_ready: true })
+}
+await call(A.client, 'set_ready', { p_ready: true })
+await call(B.client, 'set_ready', { p_ready: true })
+check((await room()).status === 'lobby', 'not everyone ready -> still in lobby')
 
 // Writing
-await call(A.client, 'start_game', { p_card_lang: 'de' })
-check((await room()).status === 'writing', 'game starts in writing phase')
+await call(C.client, 'set_ready', { p_ready: true })
+check((await room()).status === 'writing', 'last player ready -> game starts in writing phase')
 const { data: cardsB } = await B.client.from('cards').select('*')
 check(cardsB.length === 15, `everyone sees 15 cards (got ${cardsB.length})`)
 const { data: solB } = await B.client.from('solutions').select('*')
@@ -148,7 +157,9 @@ r = await room()
 check(r.status === 'finished' && r.score === 10, `game finished with team score ${r.score} (expected 10)`)
 
 // Locked cards cannot be moved (fresh game, force a partial first attempt)
-await call(A.client, 'start_game', { p_card_lang: 'fr' })
+await call(A.client, 'back_to_lobby')
+await call(A.client, 'set_settings', { p_card_lang: 'fr', p_level: 3 })
+await allReady()
 for (const p of players) await call(p.client, 'submit_clues', { p_clues: ['Un', 'Deux', 'Trois', 'Quatre'] })
 r = await room()
 {

@@ -20,7 +20,13 @@
       { "name": "Medium", "desc": "Random words, but each word on the decoy card shares a theme with a word next to a clue (like Lion and Tiger), so it looks like it belongs." },
       { "name": "Hard", "desc": "The whole clover and the decoy come from about three themes (like animals, food and weather). Clues have to be precise, and every card looks like it could fit anywhere." }
     ],
-    "start": "Start game",
+    "ready": "I'm ready",
+    "unready": "Not ready yet",
+    "readyCount": "{{ready}} of {{total}} ready",
+    "readyHint": "The game starts as soon as everyone is ready.",
+    "settingsHint": "Changing a setting resets everyone's ready.",
+    "hostTimeout": "If the host doesn't respond for 2 minutes, the room closes.",
+    "closed": "The room was closed because the host didn't respond for 2 minutes. Join again to open a new one.",
     "needPlayers": "You need 2 to 10 players to start.",
     "waitingHost": "Waiting for {{name}} to start the game…",
     "kick": "Remove",
@@ -66,7 +72,6 @@
     "title": "Game over",
     "score": "Team score: {{score}} / {{max}}",
     "tiers": ["Wilted leaves… try again!", "A small sprout.", "Nicely growing!", "A lucky clover!", "Four-leaf legends!"],
-    "backToLobby": "Back to lobby",
     "newGame": "Play again",
     "left": "left"
   },
