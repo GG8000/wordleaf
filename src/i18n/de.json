@@ -11,6 +11,8 @@
     "retry": "Nochmal versuchen"
   },
   "lobby": {
+    "shuffle": "Karten mischen",
+    "shuffleDesc": "Alle dürfen beim Schreiben einmal ihre Karten gegen neue tauschen.",
     "title": "Lobby",
     "players": "Spieler:innen ({{count}}/10)",
     "cardLang": "Kartensprache",
@@ -39,6 +41,9 @@
     ]
   },
   "writing": {
+    "shuffle": "🔀 Meine Karten mischen",
+    "shuffleHint": "Einmal pro Spiel: Du bekommst neue Karten, deine Hinweise werden gelöscht.",
+    "shuffleUsed": "Schon gemischt",
     "title": "Schreibe deine Hinweise",
     "hint": "Ein Wort pro Blatt. Es soll die beiden angrenzenden Wörter verbinden.",
     "leaf": ["Oben", "Rechts", "Unten", "Links"],
@@ -75,7 +80,16 @@
     "newGame": "Nochmal spielen",
     "left": "gegangen"
   },
+  "effects": {
+    "shuffled": "🔀 {{name}} hat neu gemischt!",
+    "selfShuffled": "🔀 Frische Karten!",
+    "go": "Los geht's! 🍀",
+    "nextClover": "Kleeblatt von {{name}}"
+  },
   "errors": {
+    "shuffle_disabled": "Karten mischen ist in diesem Spiel ausgeschaltet.",
+    "already_shuffled": "Du hast in diesem Spiel schon gemischt.",
+    "already_submitted": "Nimm deine Hinweise zurück, bevor du mischst.",
     "generic": "Etwas ist schiefgelaufen: {{msg}}",
     "invalid_name": "Bitte wähle einen Namen mit 1–20 Zeichen.",
     "game_in_progress": "Es läuft bereits eine Partie.",

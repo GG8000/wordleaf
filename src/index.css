@@ -18,3 +18,88 @@ body {
   @apply bg-leaf-50 text-stone-900 antialiased;
   font-family: ui-rounded, "Nunito", system-ui, sans-serif;
 }
+
+/* Animations -------------------------------------------------------------- */
+
+/* Card dealt onto the board (shuffle / game start), staggered via animation-delay */
+@keyframes deal {
+  from { opacity: 0; transform: translateY(-70px) rotate(-30deg) scale(0.5); }
+  to { opacity: 1; transform: none; }
+}
+/* Card lands in a slot or the tray */
+@keyframes plop {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+/* Words swing round when a card is rotated */
+@keyframes twist {
+  from { transform: rotate(-90deg); opacity: 0.2; }
+  to { transform: none; opacity: 1; }
+}
+/* Reveal: right cards cheer, wrong ones shake their head */
+@keyframes cheer {
+  0%, 100% { transform: none; }
+  30% { transform: scale(1.14) rotate(-4deg); }
+  55% { transform: scale(0.96) rotate(3deg); }
+  75% { transform: scale(1.04); }
+}
+@keyframes shake {
+  0%, 100% { transform: none; }
+  15%, 55% { transform: translateX(-7px) rotate(-4deg); }
+  35%, 75% { transform: translateX(7px) rotate(4deg); }
+}
+@keyframes pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-14deg); }
+  75% { transform: rotate(14deg); }
+}
+@keyframes spin-once {
+  to { transform: rotate(360deg); }
+}
+/* Full-screen effects */
+@keyframes fall {
+  from { transform: translateY(0) rotate(0); opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translateY(110vh) rotate(var(--spin)); opacity: 0; }
+}
+@keyframes fly {
+  0% { transform: scale(0.3) rotate(0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.8); opacity: 0; }
+}
+@keyframes banner {
+  0% { transform: scale(0.4) rotate(-6deg); opacity: 0; }
+  20% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  30%, 85% { transform: none; opacity: 1; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+@keyframes splash {
+  0% { transform: scale(0.2) rotate(-12deg); opacity: 0; }
+  25% { transform: scale(1.12) rotate(3deg); opacity: 1; }
+  40%, 75% { transform: none; opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.anim-deal { animation: deal 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.15) backwards; }
+.anim-plop { animation: plop 0.25s ease-out; }
+.anim-twist { animation: twist 0.25s ease-out; }
+.anim-cheer { animation: cheer 0.7s ease-out 0.1s; }
+.anim-shake { animation: shake 0.5s ease-in-out 0.1s 2; }
+.anim-pop { display: inline-block; animation: pop 0.35s ease-out; }
+.anim-wiggle { display: inline-block; animation: wiggle 0.6s ease-in-out 0.5s 3; }
+.anim-spin { display: inline-block; animation: spin-once 0.6s ease-in-out; }
+.fx-fall { animation: fall linear forwards; }
+.fx-fly { animation: fly 1.4s cubic-bezier(0.2, 0.7, 0.4, 1) forwards; }
+.fx-banner { animation: banner 2.2s ease-out forwards; }
+.fx-splash { animation: splash 1.4s ease-out forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  [class*='anim-'], .fx-banner, .fx-splash { animation: none !important; }
+  .fx-motion { display: none; }
+}

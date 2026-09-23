@@ -16,8 +16,8 @@ export function Lobby({ room, players, userId, online }: GameProps) {
   const levels = t('lobby.levels', { returnObjects: true }) as { name: string; desc: string }[]
 
   // Settings live on the room so everyone sees them; changing them resets all ready flags
-  const saveSettings = (lang: Lang, level: Level) =>
-    rpc('set_settings', { p_card_lang: lang, p_level: level }).catch(() => {})
+  const saveSettings = (lang: Lang, level: Level, shuffle = room.allow_shuffle) =>
+    rpc('set_settings', { p_card_lang: lang, p_level: level, p_allow_shuffle: shuffle }).catch(() => {})
 
   async function toggleReady() {
     setBusy(true)
@@ -34,7 +34,11 @@ export function Lobby({ room, players, userId, online }: GameProps) {
           hostId={room.host_id}
           userId={userId}
           online={online}
-          badge={(p) => <span title={p.ready ? t('lobby.ready') : undefined}>{p.ready ? '✅' : '⏳'}</span>}
+          badge={(p) => (
+            <span key={String(p.ready)} className="anim-pop" title={p.ready ? t('lobby.ready') : undefined}>
+              {p.ready ? '✅' : '⏳'}
+            </span>
+          )}
           onKick={isHost ? (p) => rpc('kick_player', { p_user: p.user_id }).catch(() => {}) : undefined}
         />
         <div className="flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm">
@@ -107,6 +111,19 @@ export function Lobby({ room, players, userId, online }: GameProps) {
               )
             })}
           </fieldset>
+          <label className={`flex items-start gap-3 text-sm ${isHost ? 'cursor-pointer' : ''}`}>
+            <input
+              type="checkbox"
+              checked={room.allow_shuffle}
+              disabled={!isHost}
+              onChange={(e) => saveSettings(room.card_lang, room.level, e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-leaf-600"
+            />
+            <span>
+              <span className="font-semibold">🔀 {t('lobby.shuffle')}</span>
+              <span className="block text-stone-600">{t('lobby.shuffleDesc')}</span>
+            </span>
+          </label>
           {isHost && <p className="text-xs text-stone-500">{t('lobby.settingsHint')}</p>}
         </div>
         <div className="rounded-2xl bg-white/70 p-4 shadow-sm">

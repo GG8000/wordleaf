@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { boardFromGuess, boardFromSolutions, POINTS_PERFECT } from '../lib/clover'
+import { playEffect } from '../lib/effects'
 import { rpc } from '../lib/rpc'
 import type { Placement } from '../lib/types'
 import { CardView } from './CardView'
@@ -27,6 +28,25 @@ export function GuessingPhase({ room, clovers, cards, solutions, userId, patchRo
 
   // Drop the selection when the turn or attempt changes, or the card got locked
   useEffect(() => setSelected(null), [room.current_turn, room.attempt, room.revealing])
+
+  // Splash with the author's name whenever a new clover comes up
+  const turnKey = `${room.turn_order.join()}:${room.current_turn}`
+  const announced = useRef<string | null>(null)
+  useEffect(() => {
+    if (announced.current === turnKey || !clover) return
+    announced.current = turnKey
+    playEffect({ kind: 'splash', text: t('effects.nextClover', { name: clover.owner_name }) })
+  }, [turnKey, clover, t])
+
+  // Clover confetti for a perfect clover, falling leaves for zero
+  const celebrated = useRef<string | null>(null)
+  const points = clover?.points
+  useEffect(() => {
+    if (!room.revealing || points == null || celebrated.current === turnKey) return
+    celebrated.current = turnKey
+    if (points === POINTS_PERFECT) playEffect({ kind: 'rain', emojis: ['🍀', '🍀', '🍀', '✨', '🎉'] })
+    else if (points === 0) playEffect({ kind: 'rain', emojis: ['🍂', '🍁', '🥀'], count: 16, slow: true })
+  }, [room.revealing, points, turnKey])
 
   /** Mirror of the move_card RPC so the board reacts instantly */
   function move(cardId: string, slot: number | null, rotation: number) {
@@ -78,7 +98,7 @@ export function GuessingPhase({ room, clovers, cards, solutions, userId, patchRo
       </div>
 
       {isAuthor && !room.revealing && (
-        <p className="rounded-xl bg-amber-100 p-3 text-center font-semibold text-amber-900">🤫 {t('guessing.yourClover')}</p>
+        <p className="rounded-xl bg-amber-100 p-3 text-center font-semibold text-amber-900"><span className="anim-wiggle">🤫</span> {t('guessing.yourClover')}</p>
       )}
       {room.attempt === 2 && !room.revealing && (
         <p className="rounded-xl bg-sky-100 p-3 text-center text-sm text-sky-900">{t('guessing.attempt2')}</p>
@@ -86,7 +106,9 @@ export function GuessingPhase({ room, clovers, cards, solutions, userId, patchRo
 
       {room.revealing && (
         <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-bold text-leaf-700">{t('guessing.revealTitle', { count: clover?.points ?? 0 })}</p>
+          <p key={turnKey} className="anim-pop text-2xl font-bold text-leaf-700">
+            {t('guessing.revealTitle', { count: clover?.points ?? 0 })}
+          </p>
           {clover?.points === POINTS_PERFECT && <p className="text-stone-600">{t('guessing.perfect')} 🍀</p>}
           <button
             type="button"

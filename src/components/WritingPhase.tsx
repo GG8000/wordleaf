@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { boardFromSolutions, isValidClue, leafWords } from '../lib/clover'
+import { playEffect } from '../lib/effects'
 import { rpc } from '../lib/rpc'
 import { Clover } from './Clover'
 import { PlayerList } from './PlayerList'
@@ -28,11 +29,43 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
     setClues(serverClues ? serverClues.split('\n') : ['', '', '', ''])
   }, [serverClues])
 
+  // Kick-off splash when the round starts (refs survive StrictMode's double effect run)
+  const greeted = useRef(false)
+  useEffect(() => {
+    if (greeted.current || !mine || mine.submitted) return
+    greeted.current = true
+    playEffect({ kind: 'splash', text: t('effects.go') })
+  }, [mine, t])
+
+  // Card flurry on everyone's screen when a player shuffles. The first render only
+  // records who already shuffled, so a reload doesn't replay old shuffles.
+  const shuffledSeen = useRef<Set<string> | null>(null)
+  useEffect(() => {
+    const now = new Set(clovers.filter((c) => c.shuffled).map((c) => c.owner_id))
+    if (shuffledSeen.current) {
+      for (const c of clovers) {
+        if (!now.has(c.owner_id) || shuffledSeen.current.has(c.owner_id)) continue
+        const text = c.owner_id === userId ? t('effects.selfShuffled') : t('effects.shuffled', { name: c.owner_name })
+        playEffect({ kind: 'shuffle', text })
+      }
+    }
+    shuffledSeen.current = now
+  }, [clovers, userId, t])
+
   if (!mine) {
     return <p className="text-center text-stone-600">{t('writing.submitted')}</p>
   }
 
   const allValid = clues.every(isValidClue)
+
+  const canShuffle = room.allow_shuffle && !mine.shuffled && !mine.submitted
+
+  async function shuffle() {
+    setBusy(true)
+    // New words make old clues meaningless, including ones typed but not yet submitted
+    await rpc('shuffle_clover').then(() => setClues(['', '', '', '']), () => {})
+    setBusy(false)
+  }
 
   async function submit() {
     setBusy(true)
@@ -52,7 +85,21 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
           clues={clues}
           activeLeaf={mine.submitted ? null : active}
           onLeafClick={mine.submitted ? undefined : (i) => inputs.current[i]?.focus()}
+          deal
         />
+        {room.allow_shuffle && !mine.submitted && (
+          <div className="flex flex-col items-center gap-1">
+            <button
+              type="button"
+              onClick={shuffle}
+              disabled={!canShuffle || busy}
+              className="rounded-xl border border-leaf-600 px-4 py-2 text-sm font-semibold text-leaf-700 hover:bg-leaf-50 disabled:opacity-50"
+            >
+              {mine.shuffled ? t('writing.shuffleUsed') : t('writing.shuffle')}
+            </button>
+            {canShuffle && <p className="text-center text-xs text-stone-500">{t('writing.shuffleHint')}</p>}
+          </div>
+        )}
         {mine.submitted ? (
           <div className="flex flex-col items-center gap-2">
             <p className="font-semibold text-leaf-700">{t('writing.submitted')}</p>
@@ -112,7 +159,12 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
           online={online}
           badge={(p) => {
             const c = clovers.find((c) => c.owner_id === p.user_id)
-            return c ? <span>{c.submitted ? '✅' : '✏️'}</span> : null
+            return c ? (
+              <span key={String(c.submitted)} className="anim-pop">
+                {c.shuffled && '🔀'}
+                {c.submitted ? '✅' : '✏️'}
+              </span>
+            ) : null
           }}
         />
         {isHost && (

@@ -12,6 +12,8 @@ interface Props {
   onSlotClick?: (slot: number) => void
   onRotate?: (slot: number) => void
   onLeafClick?: (leaf: number) => void
+  /** Deal the cards in one after another (new game or shuffle) */
+  deal?: boolean
 }
 
 // Clues can be up to 30 characters, so shrink long ones instead of cutting them off
@@ -36,7 +38,7 @@ function Leaf({ text, vertical, active, onClick }: { text?: string | null; verti
 }
 
 /** 2×2 card board with a clue leaf on each side */
-export function Clover({ board, clues, selectedCard, lockedSlots = [], slotStatus, activeLeaf, onSlotClick, onRotate, onLeafClick }: Props) {
+export function Clover({ board, clues, selectedCard, lockedSlots = [], slotStatus, activeLeaf, onSlotClick, onRotate, onLeafClick, deal }: Props) {
   const slot = (i: number): ReactNode => {
     const s = board[i]
     const locked = lockedSlots.includes(i)
@@ -53,8 +55,10 @@ export function Clover({ board, clues, selectedCard, lockedSlots = [], slotStatu
     }
     return (
       <CardView
-        key={i}
+        key={s.card.id} // new card in a slot -> fresh mount -> entry animation
         card={s.card}
+        anim={deal ? 'anim-deal' : 'anim-plop'}
+        animDelay={deal ? [0, 1, 3, 2].indexOf(i) * 130 : undefined}
         rotation={s.rotation}
         selected={selectedCard === s.card.id}
         locked={locked && !slotStatus}

@@ -11,6 +11,8 @@
     "retry": "Réessayer"
   },
   "lobby": {
+    "shuffle": "Mélanger les cartes",
+    "shuffleDesc": "Chacun peut échanger ses cartes contre de nouvelles une fois pendant l’écriture.",
     "title": "Salon",
     "players": "Joueurs ({{count}}/10)",
     "cardLang": "Langue des cartes",
@@ -39,6 +41,9 @@
     ]
   },
   "writing": {
+    "shuffle": "🔀 Mélanger mes cartes",
+    "shuffleHint": "Une fois par partie : tu reçois de nouvelles cartes et tes indices sont effacés.",
+    "shuffleUsed": "Déjà mélangé",
     "title": "Écris tes indices",
     "hint": "Un mot par feuille, qui relie les deux mots voisins.",
     "leaf": ["Haut", "Droite", "Bas", "Gauche"],
@@ -75,7 +80,16 @@
     "newGame": "Rejouer",
     "left": "parti"
   },
+  "effects": {
+    "shuffled": "🔀 {{name}} a mélangé ses cartes !",
+    "selfShuffled": "🔀 Cartes toutes neuves !",
+    "go": "C’est parti ! 🍀",
+    "nextClover": "Le trèfle de {{name}}"
+  },
   "errors": {
+    "shuffle_disabled": "Le mélange des cartes est désactivé pour cette partie.",
+    "already_shuffled": "Tu as déjà mélangé pendant cette partie.",
+    "already_submitted": "Reprends tes indices avant de mélanger.",
     "generic": "Une erreur est survenue : {{msg}}",
     "invalid_name": "Choisis un nom de 1 à 20 caractères.",
     "game_in_progress": "Une partie est déjà en cours.",

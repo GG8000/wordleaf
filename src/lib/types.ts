@@ -13,6 +13,7 @@ export interface Room {
   status: Status
   card_lang: Lang
   level: Level
+  allow_shuffle: boolean
   turn_order: string[]
   current_turn: number
   attempt: number
@@ -37,6 +38,7 @@ export interface Clover {
   submitted: boolean
   points: number | null
   revealed: boolean
+  shuffled: boolean
 }
 
 export interface Card {

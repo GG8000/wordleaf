@@ -11,6 +11,8 @@
     "retry": "Try again"
   },
   "lobby": {
+    "shuffle": "Card shuffle",
+    "shuffleDesc": "Everyone can swap their cards for new ones once while writing clues.",
     "title": "Lobby",
     "players": "Players ({{count}}/10)",
     "cardLang": "Card language",
@@ -39,6 +41,9 @@
     ]
   },
   "writing": {
+    "shuffle": "🔀 Shuffle my cards",
+    "shuffleHint": "Once per game: you get new cards, and your clues are cleared.",
+    "shuffleUsed": "Shuffle used",
     "title": "Write your clues",
     "hint": "One word per leaf. It should link both words next to it.",
     "leaf": ["Top", "Right", "Bottom", "Left"],
@@ -75,7 +80,16 @@
     "newGame": "Play again",
     "left": "left"
   },
+  "effects": {
+    "shuffled": "🔀 {{name}} shuffled their cards!",
+    "selfShuffled": "🔀 Fresh cards!",
+    "go": "Let's go! 🍀",
+    "nextClover": "{{name}}'s clover"
+  },
   "errors": {
+    "shuffle_disabled": "Card shuffle is turned off for this game.",
+    "already_shuffled": "You already shuffled this game.",
+    "already_submitted": "Take your clues back before shuffling.",
     "generic": "Something went wrong: {{msg}}",
     "invalid_name": "Please choose a name with 1–20 characters.",
     "game_in_progress": "A game is already running.",

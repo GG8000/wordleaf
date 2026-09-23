@@ -5,6 +5,7 @@ import { Join } from './components/Join'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { Lobby } from './components/Lobby'
 import { Results } from './components/Results'
+import { EffectsLayer } from './components/Effects'
 import { WritingPhase } from './components/WritingPhase'
 import { useAuth } from './hooks/useAuth'
 import { useRoom } from './hooks/useRoom'
@@ -35,6 +36,7 @@ export default function App() {
   }, [inRoom])
 
   // Tell players why they are suddenly back at the join screen
+  const [spins, setSpins] = useState(0)
   const [closed, setClosed] = useState(false)
   const wasIn = useRef(false)
   const leaving = useRef(false)
@@ -66,7 +68,17 @@ export default function App() {
     <div className="min-h-screen px-4 pb-16">
       <header className="mx-auto flex max-w-4xl items-center justify-between gap-3 py-4">
         <h1 className="flex items-center gap-2 text-2xl font-extrabold text-leaf-800">
-          🍀 <span>{t('app.title')}</span>
+          <button
+            type="button"
+            key={spins}
+            onClick={() => setSpins((n) => n + 1)}
+            className={spins ? 'anim-spin' : ''}
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            🍀
+          </button>
+          <span>{t('app.title')}</span>
         </h1>
         <div className="flex items-center gap-3">
           {room && room.status !== 'lobby' && me && (
@@ -96,6 +108,7 @@ export default function App() {
         {content}
       </main>
       <footer className="mx-auto mt-12 max-w-xl text-center text-xs text-stone-500">{t('app.credit')}</footer>
+      <EffectsLayer />
       {toast && (
         <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
           {toast}

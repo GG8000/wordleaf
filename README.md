@@ -45,6 +45,7 @@ The inner edges of the cards are not used.
 - For each leaf, the player writes **one clue that is a single word** (no spaces, max 30 characters) and links the two words.
 - A player can take clues back and edit them until everyone has submitted.
 - The host can **"Start guessing now"** to skip AFK players. Clovers that were not submitted are dropped.
+- **Card shuffle** (the host can turn it off in the lobby): once per game, before submitting, a player can swap their 5 cards for new ones. The new cards follow the level, and the player's clues are cleared. Everyone else sees a card-flurry animation with the player's name, and a 🔀 next to their name.
 
 ### Phase 2: Guessing (one clover at a time, in random order)
 1. The author's 4 cards and **1 decoy card** are shuffled and put in the tray with random rotations.
@@ -98,6 +99,7 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
   - If the current author leaves, the game skips to the next clover.
 - After a game, the host takes everyone back to the lobby, and a new round starts with the ready check.
 - The layout works on mobile: tapping replaces drag-and-drop, and the boards resize.
+- **Animations** (CSS only, turned off when the device asks for reduced motion): cards deal onto the board, drop into slots and spin when rotated; a splash announces the round and each clover; correct cards cheer and wrong ones shake on reveal; a perfect clover rains 🍀, zero points drops 🍂; the final score counts up; ready ticks pop; the author's 🤫 wiggles; and the 🍀 in the header spins when you tap it. Full-screen effects live in `src/lib/effects.ts` + `src/components/Effects.tsx`.
 
 ### Out of scope for now (see the roadmap)
 - Multiple lobbies or private rooms
@@ -151,10 +153,10 @@ This keeps the game consistent, and hidden information stays on the server.
 | Table | Purpose | Client access |
 |-------|---------|---------------|
 | `words(lang, word)` | Word pool, about 450 words per language | none (RPC only) |
-| `rooms` | The lobby and all game state:<br>• `status`: lobby, writing, guessing or finished<br>• `card_lang`, `level`, `host_id`<br>• `turn_order`, `current_turn`<br>• `attempt`, `revealing`<br>• `guess_state` (jsonb `{cardId: {slot, rotation}}`)<br>• `locked_slots`, `score` | read |
+| `rooms` | The lobby and all game state:<br>• `status`: lobby, writing, guessing or finished<br>• `card_lang`, `level`, `allow_shuffle`, `host_id`<br>• `turn_order`, `current_turn`<br>• `attempt`, `revealing`<br>• `guess_state` (jsonb `{cardId: {slot, rotation}}`)<br>• `locked_slots`, `score` | read |
 | `room_players` | Who is at the table (`name`, `joined_at`, `ready`) | read |
 | `heartbeats` | `last_seen` per player, used for the host timeout. Kept separate so heartbeats don't trigger realtime refetches. | none |
-| `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed` | read |
+| `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed`, `shuffled` | read |
 | `cards` | 5 per clover:<br>• `words[4]` in the order top, right, bottom, left at rotation 0<br>• `tray_order` | read |
 | `solutions` | Secret `slot` (0 = TL, 1 = TR, 2 = BR, 3 = BL, null = decoy) and `rotation` (0–3 clockwise quarter turns) | read own or revealed |
 
@@ -171,7 +173,8 @@ Every RPC takes an optional `p_room` (default `'main'`).
 | `join_room(p_name)` | anyone signed in | Take a seat (in lobby or finished only, max 10) or rename yourself. The first player becomes host. |
 | `leave_room()` | player | Leave the table. Fixes up host and game state. An empty room resets. |
 | `kick_player(p_user)` | host | Remove a player. |
-| `set_settings(p_card_lang, p_level)` | host | In the lobby: store card language and level (1–3). Clears everyone's ready. |
+| `set_settings(p_card_lang, p_level, p_allow_shuffle?)` | host | In the lobby: store card language, level (1–3) and whether card shuffle is allowed. Clears everyone's ready. |
+| `shuffle_clover()` | player | Once per game while writing and before submitting: replace your 5 cards with new ones and clear your clues. |
 | `set_ready(p_ready)` | player | In the lobby: mark yourself ready or not. When all 2–10 players are ready, the game is dealt (5 cards × 4 unique words per player, secret slots, rotations and decoy) and moves to **writing**. |
 | `heartbeat()` | player | Called every 20 s. Closes the lobby if the host has been silent for 2 minutes. |
 | `submit_clues(p_clues text[4])` | player | Validates single words. Once everyone has submitted, moves to **guessing**. |
@@ -220,7 +223,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0002_functions.sql  # game logic RPCs
 │       ├── 0003_words.sql      # word pool en/de/fr
 │       ├── 0004_levels.sql     # word categories + difficulty levels
-│       └── 0005_ready_and_heartbeat.sql  # ready check + host timeout
+│       ├── 0005_ready_and_heartbeat.sql  # ready check + host timeout
+│       └── 0006_shuffle.sql    # card shuffle
 └── scripts/smoke-test.mjs      # full-game backend test
 ```
 
