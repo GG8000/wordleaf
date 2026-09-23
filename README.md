@@ -84,7 +84,10 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 
 ### MVP (implemented)
 - Login is a **nickname only**, using Supabase anonymous auth. The session is kept in the browser, so a reload keeps your seat.
-- There is **one lobby** (`rooms.id = 'main'`) for 2–10 players.
+- There is a **public table** (`rooms.id = 'main'`) plus any number of **private lobbies**, each for 2–10 players.
+  - **Create a private lobby** on the join screen to get a 4-character code (like `K7QF`, no look-alike characters). Share the code or the invite link (`/?room=K7QF`) with your group. Codes are case-insensitive.
+  - A player is in one room at a time: joining a room leaves any other.
+  - Only members can read a private lobby (RLS), so codes can't be listed. Private lobbies that stay empty for a day are deleted the next time someone creates one.
   - The first player to join becomes host 👑.
   - If the host leaves, the host role passes to the player who has been there longest.
   - The host can remove players, for example someone who is AFK.
@@ -95,6 +98,7 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - **Loading screen:** on startup, a short animated story plays once in full (8 s): a pencil links words on a clover, the board turns and the next pair gets awkward. It's `WordleafLoader`, pure CSS and SVG. With reduced motion, the app skips the wait.
 - **Bot protection:** new players solve a Cloudflare Turnstile check before the anonymous sign-in, and Supabase Auth verifies the token. Players who already have a session never see it.
 - **Installable (PWA):** the app has a web app manifest and icons, so it can be added to the home screen on Android and iOS and opens full screen. There is no service worker, because the game needs a live connection anyway.
+- **Player map:** the 🌍 button in the footer opens a world map (Leaflet + CARTO/OpenStreetMap tiles, loaded only when opened) with anonymous dots where people are playing right now, across all rooms. On joining, the browser looks up its rough location from its IP address at [GeoJS](https://www.geojs.io/) once per session; the server rounds it to 0.1° (about 10 km) and only hands out points of players with a heartbeat in the last 5 minutes, grouped, without names. Locations older than 7 days are deleted.
 - **UI language** can be English, German or French. Each player picks it themselves with the switcher, and it is saved in the browser.
 - Game state syncs **in real time**, and online dots show who is connected (Supabase Presence).
 - **Leaving mid-game** is handled:
@@ -106,7 +110,6 @@ The selection logic is `_clover_words()` in `supabase/migrations/0004_levels.sql
 - **Animations** (CSS only, turned off when the device asks for reduced motion): cards deal onto the board, drop into slots and spin when rotated; a splash announces the round and each clover; correct cards cheer and wrong ones shake on reveal; a perfect clover rains 🍀, zero points drops 🍂; the final score counts up; ready ticks pop; the author's 🤫 wiggles; and the 🍀 in the header spins when you tap it. Full-screen effects live in `src/lib/effects.ts` + `src/components/Effects.tsx`.
 
 ### Out of scope for now (see the roadmap)
-- Multiple lobbies or private rooms
 - In-game chat (use Discord or a call)
 - A writing timer
 - Persistent stats or history
@@ -157,24 +160,27 @@ This keeps the game consistent, and hidden information stays on the server.
 | Table | Purpose | Client access |
 |-------|---------|---------------|
 | `words(lang, word)` | Word pool, about 450 words per language | none (RPC only) |
-| `rooms` | The lobby and all game state:<br>• `status`: lobby, writing, guessing or finished<br>• `card_lang`, `level`, `allow_shuffle`, `host_id`<br>• `turn_order`, `current_turn`<br>• `attempt`, `revealing`<br>• `guess_state` (jsonb `{cardId: {slot, rotation}}`)<br>• `locked_slots`, `score` | read |
-| `room_players` | Who is at the table (`name`, `joined_at`, `ready`) | read |
+| `rooms` | One per lobby (`id` = `'main'` or the share code), with all game state:<br>• `status`: lobby, writing, guessing or finished<br>• `card_lang`, `level`, `allow_shuffle`, `host_id`<br>• `turn_order`, `current_turn`<br>• `attempt`, `revealing`<br>• `guess_state` (jsonb `{cardId: {slot, rotation}}`)<br>• `locked_slots`, `score` | read `'main'` or own room |
+| `room_players` | Who is at the table (`name`, `joined_at`, `ready`) | read own room |
 | `heartbeats` | `last_seen` per player, used for the host timeout and stale-player cleanup. Kept separate so heartbeats don't trigger realtime refetches. | none |
-| `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed`, `shuffled` | read |
-| `cards` | 5 per clover:<br>• `words[4]` in the order top, right, bottom, left at rotation 0<br>• `tray_order` | read |
-| `solutions` | Secret `slot` (0 = TL, 1 = TR, 2 = BR, 3 = BL, null = decoy) and `rotation` (0–3 clockwise quarter turns) | read own or revealed |
+| `clovers` | One per player per game:<br>• `owner_name`<br>• `clues[4]` in the order top, right, bottom, left<br>• `submitted`, `points`, `revealed`, `shuffled` | read own room |
+| `cards` | 5 per clover:<br>• `words[4]` in the order top, right, bottom, left at rotation 0<br>• `tray_order` | read own room |
+| `solutions` | Secret `slot` (0 = TL, 1 = TR, 2 = BR, 3 = BL, null = decoy) and `rotation` (0–3 clockwise quarter turns) | read own or revealed (own room) |
+| `player_locations` | Rounded `lat`/`lon` per user for the player map | none (RPC only) |
 
-Realtime publishes changes to `rooms`, `room_players` and `clovers`. Clients refetch cards and solutions whenever the phase or turn changes.
+Realtime publishes changes to `rooms`, `room_players` and `clovers`; clients filter them by room. Clients refetch cards and solutions whenever the phase or turn changes.
 
 **Rotation maths:** the word shown on edge `e` of a card rotated `r` times is `words[(e − r) mod 4]`. This is implemented in `src/lib/clover.ts` and unit-tested.
 
 ## 5. RPC API
 
-Every RPC takes an optional `p_room` (default `'main'`).
+Every game RPC takes an optional `p_room` (default `'main'`). The client sends the room it is looking at.
 
 | Function | Who | What |
 |----------|-----|------|
-| `join_room(p_name)` | anyone signed in | Take a seat (in lobby or finished only, max 10) or rename yourself. The first player becomes host. |
+| `create_room(p_name)` | anyone signed in | Open a private lobby, join it as host and return its code. |
+| `get_room()` | anyone signed in | The room row for a code (even if you're not in it), or nothing. |
+| `join_room(p_name)` | anyone signed in | Take a seat (in lobby or finished only, max 10) or rename yourself. Leaves any other room first. The first player becomes host. Unknown codes fail with `room_not_found`. |
 | `leave_room()` | player | Leave the table. Fixes up host and game state. An empty room resets. |
 | `kick_player(p_user)` | host | Remove a player. |
 | `set_settings(p_card_lang, p_level, p_allow_shuffle?)` | host | In the lobby: store card language, level (1–3) and whether card shuffle is allowed. Clears everyone's ready. |
@@ -188,6 +194,8 @@ Every RPC takes an optional `p_room` (default `'main'`).
 | `submit_guess()` | guesser | Score the guess: attempt 1 is perfect or goes to attempt 2 with locks; after attempt 2, reveal the solution. |
 | `next_clover()` | player | After a reveal, move to the next clover or to **finished**. |
 | `back_to_lobby()` | host | Reset to the lobby and clear all ready flags ("Play again"). |
+| `set_location(p_lat, p_lon)` | anyone signed in | Store your rough location for the map (rounded to 0.1°). No `p_room`. |
+| `player_map()` | anyone, even signed out | Points `(lat, lon, players)` of everyone with a recent heartbeat. No `p_room`. |
 
 Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`, `author_cannot_guess`), and the UI translates them in `errors.*`.
 
@@ -213,6 +221,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │   ├── lib/
 │   │   ├── supabase.ts         # client (+ ?p=N test profiles)
 │   │   ├── clover.ts           # board geometry, rotation, rating (tested)
+│   │   ├── room.ts             # current room (public or ?room=CODE), invite links
+│   │   ├── geo.ts              # IP-based location for the player map
 │   │   ├── rpc.ts              # RPC wrapper with translated errors
 │   │   ├── toast.ts, types.ts
 │   ├── hooks/
@@ -221,6 +231,7 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │   └── components/
 │       ├── Join, Lobby, WritingPhase, GuessingPhase, Results
 │       ├── Clover (board + leaves), CardView, PlayerList, LanguageSwitcher
+│       ├── PlayerMap           # footer map dialog (lazy-loaded Leaflet)
 │       └── WordleafLoader (+ .css)   # animated loading screen
 ├── supabase/
 │   ├── config.toml             # anonymous sign-ins enabled
@@ -231,7 +242,8 @@ Errors come back as short codes (for example `not_host`, `clue_must_be_one_word`
 │       ├── 0004_levels.sql     # word categories + difficulty levels
 │       ├── 0005_ready_and_heartbeat.sql  # ready check + host timeout
 │       ├── 0006_shuffle.sql    # card shuffle
-│       └── 0007_stale_players.sql  # remove silent players, reset abandoned games
+│       ├── 0007_stale_players.sql  # remove silent players, reset abandoned games
+│       └── 0008_lobbies_and_map.sql  # private lobbies with codes, membership RLS, player map
 └── scripts/
     ├── smoke-test.mjs          # full-game backend test
     └── make-icons.sh           # renders the PNG icons from public/icon.svg (needs rsvg-convert)
@@ -272,6 +284,8 @@ The smoke test resets the `main` room and plays through the game with 3 anonymou
 - locked cards cannot be moved
 - leaving mid-game and passing on the host role
 - realtime delivery
+- private lobbies: codes, membership RLS, `room_not_found`, one room per player
+- the player map: rounding, validation, access without signing in
 
 ---
 
@@ -299,7 +313,6 @@ Do steps 4 and 5 together: with CAPTCHA protection on in Supabase but no site ke
 
 ## 9. Roadmap / ideas
 
-- Several rooms with share codes (the schema already has a `room_id` key)
 - An optional writing timer and a "hurry up" nudge
 - Drag and drop with animations, and a sound when cards lock
 - Text chat for guessers, hidden from the author

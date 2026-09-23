@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { inviteLink, PUBLIC_ROOM } from '../lib/room'
 import { rpc } from '../lib/rpc'
+import { showToast } from '../lib/toast'
 import type { Lang, Level } from '../lib/types'
 import { PlayerList } from './PlayerList'
 import type { GameProps } from './types'
@@ -25,9 +27,36 @@ export function Lobby({ room, players, userId, online }: GameProps) {
     setBusy(false)
   }
 
+  async function share() {
+    const url = inviteLink(room.id)
+    try {
+      await navigator.clipboard.writeText(url)
+      showToast(t('lobby.linkCopied'))
+    } catch {
+      // No clipboard access (e.g. insecure context): fall back to the share sheet
+      await navigator.share?.({ title: t('app.title'), url }).catch(() => {})
+    }
+  }
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <section className="flex flex-col gap-3">
+        {room.id !== PUBLIC_ROOM && (
+          <div className="flex items-center justify-between gap-3 rounded-2xl bg-leaf-100 p-4">
+            <div>
+              <p className="text-xs font-semibold uppercase text-leaf-800">{t('lobby.code')}</p>
+              <p className="font-mono text-3xl font-extrabold tracking-[0.3em] text-leaf-900">{room.id}</p>
+              <p className="text-xs text-leaf-800">{t('lobby.shareHint')}</p>
+            </div>
+            <button
+              type="button"
+              onClick={share}
+              className="shrink-0 rounded-xl bg-leaf-600 px-3 py-2 text-sm font-bold text-white hover:bg-leaf-700"
+            >
+              {t('lobby.copyLink')}
+            </button>
+          </div>
+        )}
         <h2 className="text-lg font-bold">{t('lobby.players', { count: players.length })}</h2>
         <PlayerList
           players={players}

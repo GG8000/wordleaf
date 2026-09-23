@@ -200,5 +200,41 @@ for (const p of players) await p.client.rpc('leave_room')
 r = await room()
 check(r.status === 'lobby' && r.host_id === null, 'empty room resets to lobby')
 
+// Private lobbies: a code to share, only members can see inside, one room per player
+{
+  const { data: code, error } = await A.client.rpc('create_room', { p_name: 'Ana' })
+  check(!error && /^[A-HJKMNP-Z2-9]{4}$/.test(code ?? ''), `create_room returns a 4-letter code (got ${code ?? error?.message})`)
+  await call(B.client, 'join_room', { p_name: 'Ben', p_room: ` ${code.toLowerCase()} ` })
+  const { data: members } = await admin.from('room_players').select('user_id').eq('room_id', code)
+  check(members.length === 2, 'second player joins with a lower-case code')
+  const { data: host } = await admin.from('rooms').select('host_id').eq('id', code).single()
+  check(host.host_id === A.id, 'creator hosts the private lobby')
+
+  const { data: peekRooms } = await C.client.from('rooms').select('id')
+  check(!peekRooms.some((x) => x.id === code), 'private lobbies are not listable by outsiders')
+  const { data: peekPlayers } = await C.client.from('room_players').select('*').eq('room_id', code)
+  check(peekPlayers.length === 0, "outsiders cannot see a private lobby's players")
+  const { data: byCode } = await C.client.rpc('get_room', { p_room: code })
+  check(byCode?.length === 1, 'get_room finds a lobby by its code')
+  await expectError(C.client, 'join_room', { p_name: 'Cleo', p_room: 'ZZZZ9' }, 'room_not_found')
+
+  await call(B.client, 'join_room', { p_name: 'Ben' })
+  const { data: inPrivate } = await admin.from('room_players').select('user_id').eq('room_id', code)
+  check(inPrivate.length === 1, 'joining the public table leaves the private lobby')
+
+  // Map: rounded, and only players with a recent heartbeat
+  await call(B.client, 'set_location', { p_lat: 47.8095, p_lon: 13.055 })
+  const { data: points } = await C.client.rpc('player_map')
+  check(points?.some((p) => Math.abs(p.lat - 47.8) < 1e-4 && Math.abs(p.lon - 13.1) < 1e-4), 'player_map shows the rounded location')
+  const { data: anonPoints, error: anonError } = await createClient(API_URL, ANON, opts).rpc('player_map')
+  check(!anonError && Array.isArray(anonPoints), 'player_map works without signing in')
+  await expectError(B.client, 'set_location', { p_lat: 123, p_lon: 0 }, 'invalid_location')
+
+  await A.client.rpc('leave_room', { p_room: code })
+  await B.client.rpc('leave_room')
+  await admin.from('player_locations').delete().eq('user_id', B.id)
+  await admin.from('rooms').delete().eq('id', code)
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

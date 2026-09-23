@@ -14,5 +14,3 @@ const project = url ? new URL(url).host : 'none'
 export const supabase = createClient(url ?? 'http://localhost', key ?? 'missing', {
   auth: { storageKey: `wordleaf-auth-${project}${profile ? `-p${profile}` : ''}` },
 })
-
-export const ROOM_ID = 'main'

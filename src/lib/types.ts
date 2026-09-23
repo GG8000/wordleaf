@@ -54,3 +54,9 @@ export interface Solution {
   slot: number | null
   rotation: number
 }
+
+export interface MapPoint {
+  lat: number
+  lon: number
+  players: number
+}

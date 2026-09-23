@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ROOM_ID, supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import type { Card, Clover, Player, Room, Solution } from '../lib/types'
 
 export interface RoomData {
@@ -25,7 +25,7 @@ function time(ts: string): number {
   return Date.parse(ts.replace(' ', 'T').replace(/([+-]\d\d)$/, '$1:00'))
 }
 
-export function useRoom(userId: string | null) {
+export function useRoom(userId: string | null, roomId: string) {
   const [data, setData] = useState<RoomData>(empty)
   const [online, setOnline] = useState<Set<string>>(new Set())
   const roomRef = useRef<Room | null>(null)
@@ -35,11 +35,11 @@ export function useRoom(userId: string | null) {
   const refetch = useCallback(async () => {
     const id = ++seq.current
     const [r, p, c, k, s] = await Promise.all([
-      supabase.from('rooms').select('*').eq('id', ROOM_ID).single(),
-      supabase.from('room_players').select('user_id,name,joined_at,ready').eq('room_id', ROOM_ID).order('joined_at'),
-      supabase.from('clovers').select('owner_id,owner_name,clues,submitted,points,revealed,shuffled').eq('room_id', ROOM_ID),
-      supabase.from('cards').select('id,owner_id,words,tray_order').eq('room_id', ROOM_ID).order('tray_order'),
-      supabase.from('solutions').select('card_id,owner_id,slot,rotation').eq('room_id', ROOM_ID),
+      supabase.rpc('get_room', { p_room: roomId }).maybeSingle(),
+      supabase.from('room_players').select('user_id,name,joined_at,ready').eq('room_id', roomId).order('joined_at'),
+      supabase.from('clovers').select('owner_id,owner_name,clues,submitted,points,revealed,shuffled').eq('room_id', roomId),
+      supabase.from('cards').select('id,owner_id,words,tray_order').eq('room_id', roomId).order('tray_order'),
+      supabase.from('solutions').select('card_id,owner_id,slot,rotation').eq('room_id', roomId),
     ])
     if (id !== seq.current) return // a newer refetch is in flight
     setData((prev) => {
@@ -54,7 +54,7 @@ export function useRoom(userId: string | null) {
         loaded: true,
       }
     })
-  }, [])
+  }, [roomId])
 
   const scheduleRefetch = useCallback(() => {
     clearTimeout(timer.current)
@@ -72,15 +72,14 @@ export function useRoom(userId: string | null) {
   }, [])
 
   useEffect(() => {
-    if (!userId) {
-      setData(empty)
-      return
-    }
+    setData(empty)
+    roomRef.current = null
+    if (!userId) return
     refetch()
 
-    const channel = supabase.channel(`room:${ROOM_ID}`, { config: { presence: { key: userId } } })
+    const channel = supabase.channel(`room:${roomId}`, { config: { presence: { key: userId } } })
     channel
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${ROOM_ID}` }, (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, (payload) => {
         const next = payload.new as Room
         const prev = roomRef.current
         // Phase or turn changes affect cards/solutions/clovers too
@@ -96,9 +95,17 @@ export function useRoom(userId: string | null) {
         roomRef.current = newer(prev, next)
         setData((d) => ({ ...d, room: newer(d.room, next) }))
       })
-      // DELETE events cannot be filtered, so listen to the whole table (one room anyway)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_players' }, scheduleRefetch)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'clovers' }, scheduleRefetch)
+    for (const table of ['room_players', 'clovers']) {
+      const filter = `room_id=eq.${roomId}`
+      channel
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table, filter }, scheduleRefetch)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table, filter }, scheduleRefetch)
+        // DELETE events cannot be filtered, but they carry the primary key, which includes the room
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table }, (payload) => {
+          if ((payload.old as { room_id?: string }).room_id === roomId) scheduleRefetch()
+        })
+    }
+    channel
       .on('presence', { event: 'sync' }, () => setOnline(new Set(Object.keys(channel.presenceState()))))
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -114,7 +121,7 @@ export function useRoom(userId: string | null) {
       clearTimeout(timer.current)
       supabase.removeChannel(channel)
     }
-  }, [userId, refetch, scheduleRefetch])
+  }, [userId, roomId, refetch, scheduleRefetch])
 
   return { ...data, online, refetch, patchRoom }
 }

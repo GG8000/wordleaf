@@ -3,9 +3,16 @@
   "common": { "leave": "Verlassen", "host": "Host", "you": "du", "points": "{{count}} Pkt.", "online": "online", "offline": "offline" },
   "config": { "missing": "Supabase ist nicht konfiguriert. Kopiere .env.example nach .env und trage Projekt-URL und Anon-Key ein." },
   "login": {
+    "joinPublic": "Am öffentlichen Tisch mitspielen",
+    "joinLobby": "Lobby {{code}} beitreten",
+    "or": "oder",
+    "createLobby": "Private Lobby erstellen",
+    "haveCode": "Hast du einen Code?",
+    "codePlaceholder": "K7QF",
+    "joinCode": "Beitreten",
+    "backToPublic": "Zurück zum öffentlichen Tisch",
     "nickname": "Dein Spitzname",
     "placeholder": "z. B. Kim",
-    "join": "An den Tisch setzen",
     "joining": "Beitreten…",
     "inProgress": "Gerade läuft eine Partie. Du kannst beitreten, sobald sie vorbei ist.",
     "retry": "Nochmal versuchen",
@@ -13,6 +20,10 @@
     "captchaBlocked": "Die Sicherheitsprüfung konnte nicht geladen werden. Schalte Inhaltsblocker für diese Seite aus oder lade die Seite neu."
   },
   "lobby": {
+    "code": "Lobby-Code",
+    "shareHint": "Teile den Code oder den Link mit deiner Gruppe.",
+    "copyLink": "Einladungslink kopieren",
+    "linkCopied": "Einladungslink kopiert!",
     "shuffle": "Karten mischen",
     "shuffleDesc": "Alle dürfen beim Schreiben einmal ihre Karten gegen neue tauschen.",
     "title": "Lobby",
@@ -89,6 +100,7 @@
     "nextClover": "Kleeblatt von {{name}}"
   },
   "errors": {
+    "room_not_found": "Es gibt keine Lobby mit diesem Code. Prüfe ihn auf Tippfehler.",
     "shuffle_disabled": "Karten mischen ist in diesem Spiel ausgeschaltet.",
     "already_shuffled": "Du hast in diesem Spiel schon gemischt.",
     "already_submitted": "Nimm deine Hinweise zurück, bevor du mischst.",
@@ -110,5 +122,6 @@
     "not_in_room": "Du sitzt nicht mehr am Tisch."
   },
   "loader": { "label": "Lädt…", "messages": ["Pflücke neue Wortkombinationen…", "Entwirre Gehirnwindungen…", "Begründe gewagte Assoziationen…", "Bring die Blätter in Einklang…"], "words": {"a": "Vulkan", "b": "Schokolade", "c": "Polizei", "clue1": "Lava-Kuchen", "clue2": "Bestechung?!"} },
+  "map": { "open": "Wo gespielt wird", "title": "Wer gerade spielt", "close": "Schließen", "players_one": "{{count}} Person", "players_other": "{{count}} Personen", "count_one": "Gerade spielt {{count}} Person", "count_other": "Gerade spielen {{count}} Personen", "note": "Die Orte sind ungefähr (aus der IP-Adresse, auf etwa 10 km gerundet) und anonym." },
   "langs": { "en": "English", "de": "Deutsch", "fr": "Français" }
 }
