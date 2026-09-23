@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Wordleaf app icon. Artwork stays inside the maskable safe zone (radius 204 around the
+       center); scripts/make-icons.sh renders the PNGs, with square corners for the maskable one. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#51ad57"/>
+      <stop offset="1" stop-color="#276e34"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e3f5d7"/>
+    </linearGradient>
+  </defs>
+  <rect id="background" width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M256 250 C258 312 272 352 312 386" fill="none" stroke="#e3f5d7" stroke-width="18" stroke-linecap="round"/>
+  <g>
+    <g transform="translate(256 236) rotate(45) translate(0 -7) scale(1.45) translate(-50 -88)">
+      <path d="M50 88 C22 68 6 50 6 33 C6 18 17 8 30 8 C39 8 46 13 50 22 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 50 78 68 50 88 Z" fill="url(#leaf)"/>
+      <path d="M33 38 H67 M38 52 H60" stroke="#a6de99" stroke-width="5.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(256 236) rotate(135) translate(0 -7) scale(1.45) translate(-50 -88)">
+      <path d="M50 88 C22 68 6 50 6 33 C6 18 17 8 30 8 C39 8 46 13 50 22 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 50 78 68 50 88 Z" fill="url(#leaf)"/>
+      <path d="M33 38 H67 M38 52 H60" stroke="#a6de99" stroke-width="5.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(256 236) rotate(225) translate(0 -7) scale(1.45) translate(-50 -88)">
+      <path d="M50 88 C22 68 6 50 6 33 C6 18 17 8 30 8 C39 8 46 13 50 22 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 50 78 68 50 88 Z" fill="url(#leaf)"/>
+      <path d="M33 38 H67 M38 52 H60" stroke="#a6de99" stroke-width="5.5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(256 236) rotate(315) translate(0 -7) scale(1.45) translate(-50 -88)">
+      <path d="M50 88 C22 68 6 50 6 33 C6 18 17 8 30 8 C39 8 46 13 50 22 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 50 78 68 50 88 Z" fill="url(#leaf)"/>
+      <path d="M33 38 H67 M38 52 H60" stroke="#a6de99" stroke-width="5.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <circle cx="256" cy="236" r="9" fill="#a6de99"/>
+  <path d="M378 102 Q382 124 404 128 Q382 132 378 154 Q374 132 352 128 Q374 124 378 102 Z" fill="#fcd34d"/>
+</svg>

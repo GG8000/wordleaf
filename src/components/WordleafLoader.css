@@ -1,0 +1,196 @@
+/* WordleafLoader: "the overwhelmed leaf".
+   Every animation shares one loop (--wl-loop, set from LOADER_LOOP_MS), so the percentages
+   below are one timeline:
+     0-38%  two word cards land, the pencil writes the first clue, sparkle
+    40-57%  the board swings 90° counter-clockwise, a third card shows up
+    56-84%  the pencil hesitates (sweat, "?"), then scribbles the second clue in a panic
+    84-100% a gust blows cards and clues away and the board swings back
+   The base (non-animated) styles are the still frame shown with reduced motion. */
+
+.wl-scene { container-type: inline-size; }
+.wl-scene * { animation-duration: var(--wl-loop); animation-iteration-count: infinite; }
+
+/* Board ------------------------------------------------------------------- */
+
+.wl-board { animation-name: wl-turn; animation-timing-function: ease-in-out; }
+/* Keeps the word cards upright while the board turns */
+.wl-upright { animation-name: wl-upright; animation-timing-function: ease-in-out; }
+
+@keyframes wl-turn {
+  0%, 40% { transform: rotate(0); }
+  47% { transform: rotate(-104deg); }
+  51% { transform: rotate(-85deg); }
+  54% { transform: rotate(-92deg); }
+  57%, 86% { transform: rotate(-90deg); }
+  93% { transform: rotate(4deg); }
+  96%, 100% { transform: rotate(0); }
+}
+@keyframes wl-upright {
+  0%, 40% { transform: rotate(0); }
+  47% { transform: rotate(104deg); }
+  51% { transform: rotate(85deg); }
+  54% { transform: rotate(92deg); }
+  57%, 86% { transform: rotate(90deg); }
+  93% { transform: rotate(-4deg); }
+  96%, 100% { transform: rotate(0); }
+}
+
+/* Word cards: pop in, flutter in the gust, fly off to the right */
+.wl-card-a { animation-name: wl-card-a; }
+.wl-card-b { animation-name: wl-card-b; }
+.wl-card-c { animation-name: wl-card-c; }
+
+@keyframes wl-card-a {
+  0%, 4% { opacity: 0; transform: scale(0.3); }
+  8% { opacity: 1; transform: scale(1.15); }
+  10%, 84% { opacity: 1; transform: none; }
+  87% { opacity: 1; transform: translate(1.5cqw, -2cqw) rotate(-10deg); }
+  93%, 100% { opacity: 0; transform: translate(45cqw, -8cqw) rotate(30deg); }
+}
+@keyframes wl-card-b {
+  0%, 9% { opacity: 0; transform: scale(0.3); }
+  13% { opacity: 1; transform: scale(1.15); }
+  15%, 85% { opacity: 1; transform: none; }
+  88% { opacity: 1; transform: translate(1.5cqw, -1.5cqw) rotate(8deg); }
+  94%, 100% { opacity: 0; transform: translate(40cqw, -4cqw) rotate(-25deg); }
+}
+@keyframes wl-card-c {
+  0%, 49% { opacity: 0; transform: scale(0.3); }
+  53% { opacity: 1; transform: scale(1.15); }
+  55%, 84% { opacity: 1; transform: none; }
+  88% { opacity: 1; transform: translate(1cqw, -2.5cqw) rotate(-6deg); }
+  94%, 100% { opacity: 0; transform: translate(40cqw, 2cqw) rotate(20deg); }
+}
+
+/* Leaves: the first one glows on success, the second one blushes in panic */
+.wl-leaf-hit { animation-name: wl-leaf-hit; }
+.wl-leaf-panic { animation-name: wl-leaf-panic; }
+
+@keyframes wl-leaf-hit {
+  0%, 31%, 42%, 100% { transform: none; box-shadow: 0 0 0 0 transparent; }
+  34% { transform: scale(1.12); box-shadow: 0 0 0 1.2cqw oklch(0.87 0.16 90 / 0.7); }
+}
+@keyframes wl-leaf-panic {
+  0%, 66%, 90%, 100% { background-color: var(--color-leaf-600); }
+  72%, 84% { background-color: oklch(0.68 0.17 45); }
+}
+
+/* Clues are "written" left to right by uncovering them, then blown away */
+.wl-clue-1 { animation-name: wl-write-1; animation-timing-function: linear; }
+.wl-clue-2 { opacity: 0; animation-name: wl-write-2; animation-timing-function: linear; }
+
+@keyframes wl-write-1 {
+  0%, 20% { opacity: 1; clip-path: inset(0 100% 0 0); filter: none; }
+  32%, 84% { opacity: 1; clip-path: inset(0 0 0 0); filter: none; }
+  90%, 100% { opacity: 0; clip-path: inset(0 0 0 0); filter: blur(3px); }
+}
+@keyframes wl-write-2 {
+  0%, 66% { opacity: 1; clip-path: inset(0 100% 0 0); filter: none; animation-timing-function: steps(8); }
+  80%, 85% { opacity: 1; clip-path: inset(0 0 0 0); filter: none; }
+  91%, 100% { opacity: 0; clip-path: inset(0 0 0 0); filter: blur(3px); }
+}
+/* Panicky handwriting */
+.wl-jitter { animation-name: wl-jitter; }
+@keyframes wl-jitter {
+  0%, 66%, 82%, 100% { transform: none; }
+  68%, 72%, 76%, 80% { transform: translate(0.3cqw, -0.3cqw) rotate(-3deg); }
+  70%, 74%, 78% { transform: translate(-0.3cqw, 0.3cqw) rotate(2deg); }
+}
+
+/* Pencil mascot ------------------------------------------------------------ */
+
+.wl-mascot { transform: rotate(45deg); animation-name: wl-mascot; animation-timing-function: ease-in-out; }
+
+@keyframes wl-mascot {
+  0%, 14% { transform: rotate(45deg); }
+  7% { transform: translateY(-1.5cqw) rotate(45deg); }
+  /* move over and tap */
+  18% { transform: translate(-4cqw, 4cqw) rotate(50deg); }
+  20% { transform: translate(-4cqw, 5cqw) rotate(54deg); }
+  /* write */
+  23%, 27%, 31% { transform: translate(-5.5cqw, 5cqw) rotate(50deg); }
+  25%, 29% { transform: translate(-3cqw, 4.5cqw) rotate(56deg); }
+  /* proud lean back */
+  35% { transform: translate(-1cqw, 1cqw) rotate(32deg); }
+  40% { transform: rotate(45deg); }
+  /* startled by the turn, then hesitating */
+  47%, 55% { transform: translate(1.5cqw, -1cqw) rotate(30deg); }
+  58%, 62% { transform: translate(1cqw, -0.5cqw) rotate(24deg); }
+  60%, 64% { transform: translate(1cqw, -0.5cqw) rotate(38deg); }
+  /* panic scribble */
+  67% { transform: translate(-4cqw, 5cqw) rotate(52deg); }
+  69%, 73%, 77% { transform: translate(-6cqw, 4.5cqw) rotate(44deg); }
+  71%, 75%, 79% { transform: translate(-2.5cqw, 5.5cqw) rotate(60deg); }
+  82% { transform: translate(-3cqw, 4cqw) rotate(50deg); }
+  /* the gust */
+  86% { transform: rotate(45deg); }
+  90% { transform: translate(2cqw, 0.5cqw) rotate(58deg); }
+  96%, 100% { transform: rotate(45deg); }
+}
+
+.wl-face-happy { animation-name: wl-happy; }
+.wl-face-worried { opacity: 0; animation-name: wl-worried; }
+@keyframes wl-happy {
+  0%, 54%, 86%, 100% { opacity: 1; }
+  56%, 84% { opacity: 0; }
+}
+@keyframes wl-worried {
+  0%, 54%, 86%, 100% { opacity: 0; }
+  56%, 84% { opacity: 1; }
+}
+
+.wl-sweat-1, .wl-sweat-2 { opacity: 0; }
+.wl-sweat-1 { animation-name: wl-sweat-1; animation-timing-function: ease-in; }
+.wl-sweat-2 { animation-name: wl-sweat-2; animation-timing-function: ease-in; }
+@keyframes wl-sweat-1 {
+  0%, 56% { opacity: 0; transform: none; }
+  58% { opacity: 1; transform: none; }
+  68%, 100% { opacity: 0; transform: translate(1cqw, 5cqw); }
+}
+@keyframes wl-sweat-2 {
+  0%, 63% { opacity: 0; transform: none; }
+  65% { opacity: 1; transform: none; }
+  76%, 100% { opacity: 0; transform: translate(1.5cqw, 5cqw); }
+}
+
+.wl-ask { opacity: 0; animation-name: wl-ask; }
+@keyframes wl-ask {
+  0%, 56% { opacity: 0; transform: scale(0); }
+  59% { opacity: 1; transform: scale(1.25); }
+  61% { opacity: 1; transform: scale(1) rotate(-10deg); }
+  63% { opacity: 1; transform: scale(1) rotate(10deg); }
+  65% { opacity: 1; transform: scale(1); }
+  68%, 100% { opacity: 0; transform: scale(0); }
+}
+
+/* Effects ------------------------------------------------------------------ */
+
+.wl-spark { opacity: 0; animation-name: wl-spark; }
+@keyframes wl-spark {
+  0%, 32% { opacity: 0; transform: scale(0) rotate(0); }
+  35% { opacity: 1; transform: scale(1.3) rotate(45deg); }
+  41%, 100% { opacity: 0; transform: scale(0) rotate(120deg); }
+}
+
+.wl-wind { opacity: 0; animation-name: wl-wind; animation-timing-function: ease-out; }
+@keyframes wl-wind {
+  0%, 83% { opacity: 0; transform: translateX(-45cqw); }
+  86% { opacity: 0.9; }
+  95%, 100% { opacity: 0; transform: translateX(115cqw); }
+}
+
+/* Loading text: one fade in/out per 2 s message, four messages per loop */
+.wl-msg { animation: wl-msg 2s ease-in-out both; }
+.wl-msg-static { animation: wl-msg-in 0.4s ease-out both; }
+@keyframes wl-msg {
+  0% { opacity: 0; transform: translateY(4px); }
+  15%, 85% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes wl-msg-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-scene *, .wl-msg, .wl-msg-static { animation: none !important; }
+}
