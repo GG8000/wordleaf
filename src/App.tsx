@@ -7,6 +7,7 @@ import { Lobby } from './components/Lobby'
 import { Results } from './components/Results'
 import { EffectsLayer } from './components/Effects'
 import { InstallApp } from './components/InstallApp'
+import { UpdateBanner } from './components/UpdateBanner'
 import { LOADER_LOOP_MS, WordleafLoader } from './components/WordleafLoader'
 import { WritingPhase } from './components/WritingPhase'
 import { useAuth } from './hooks/useAuth'
@@ -162,6 +163,7 @@ export default function App() {
       )}
       {installOpen && <InstallApp onClose={() => setInstallOpen(false)} />}
       <EffectsLayer />
+      <UpdateBanner inGame={inRoom} />
       {toast && (
         <div className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-xl bg-stone-900 px-4 py-3 text-center text-sm text-white shadow-lg">
           {toast}

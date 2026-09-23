@@ -36,6 +36,8 @@ Samsung Internet, Edge and Firefox work the same way: find **Add to Home screen*
 To remove the app, long-press its icon and choose **Uninstall** (Android) or **Delete Bookmark** / **Remove App** (iOS).
 
 > **For self-hosters:** installing only works over **HTTPS** (or on `localhost`). The PWA setup is `public/manifest.webmanifest`, the icons in `public/` (you can regenerate them with `scripts/make-icons.sh`) and the `apple-*` meta tags in `index.html`. If you change the name or colors, update both places.
+>
+> **Updates:** `vite-plugin-pwa` builds a service worker (`sw.js`) that caches each build. Installed apps check for a new version every hour and each time they come back to the foreground. Outside a room, the update applies on its own. Inside a room, players see an **Update** banner, so nobody gets reloaded in the middle of a round. Make sure your host doesn't cache `sw.js` for a long time. The Vercel and Netlify defaults are fine.
 
 ---
 
