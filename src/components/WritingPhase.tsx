@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { boardFromSolutions, isValidClue, leafWords } from '../lib/clover'
+import { boardFromSolutions, clueOnCard, isValidClue, leafWords } from '../lib/clover'
 import { playEffect } from '../lib/effects'
 import { rpc } from '../lib/rpc'
 import { Clover } from './Clover'
@@ -56,7 +56,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
     return <p className="text-center text-stone-600">{t('writing.submitted')}</p>
   }
 
-  const allValid = clues.every(isValidClue)
+  const allValid = clues.every((c) => isValidClue(c) && !clueOnCard(board, c))
 
   const canShuffle = room.allow_shuffle && !mine.shuffled && !mine.submitted
 
@@ -117,7 +117,8 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
           >
             {[0, 1, 2, 3].map((i) => {
               const [a, b] = leafWords(board, i)
-              const invalid = clues[i] !== '' && !isValidClue(clues[i])
+              const onCard = clueOnCard(board, clues[i])
+              const invalid = clues[i] !== '' && (!isValidClue(clues[i]) || onCard)
               return (
                 <label key={i} className="flex flex-col gap-0.5 text-xs font-semibold text-stone-500">
                   <span>
@@ -137,6 +138,7 @@ export function WritingPhase({ room, players, clovers, cards, solutions, userId,
                       invalid ? 'border-rose-400' : 'border-stone-300 focus:border-leaf-500'
                     }`}
                   />
+                  {onCard && <span className="font-normal text-rose-600">{t('errors.clue_on_card')}</span>}
                 </label>
               )
             })}

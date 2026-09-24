@@ -132,6 +132,7 @@
     "not_enough_words": "Not enough words in the card language.",
     "invalid_level": "Invalid level.",
     "clue_must_be_one_word": "Each clue must be a single word.",
+    "clue_on_card": "That word is already on one of your cards.",
     "need_4_clues": "Please fill in all 4 clues.",
     "place_4_cards": "Place 4 cards first.",
     "card_locked": "That card is locked.",

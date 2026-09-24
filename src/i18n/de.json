@@ -132,6 +132,7 @@
     "not_enough_words": "Nicht genug Wörter in der Kartensprache.",
     "invalid_level": "Ungültige Schwierigkeit.",
     "clue_must_be_one_word": "Jeder Hinweis muss aus einem Wort bestehen.",
+    "clue_on_card": "Das Wort steht schon auf einer deiner Karten.",
     "need_4_clues": "Bitte fülle alle 4 Hinweise aus.",
     "place_4_cards": "Legt zuerst 4 Karten.",
     "card_locked": "Diese Karte ist fixiert.",

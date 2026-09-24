@@ -70,3 +70,9 @@ export function isValidClue(clue: string): boolean {
   const c = clue.trim()
   return c.length >= 1 && c.length <= 30 && !/\s/.test(c)
 }
+
+/** True if the clue is one of the words on the placed cards (case-insensitive) */
+export function clueOnCard(board: Board, clue: string): boolean {
+  const c = clue.trim().toLowerCase()
+  return board.some((s) => s?.card.words.some((w) => w.toLowerCase() === c) ?? false)
+}

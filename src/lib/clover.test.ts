@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boardFromGuess, isValidClue, leafWords, ratingTier, wordOnEdge } from './clover'
+import { boardFromGuess, clueOnCard, isValidClue, leafWords, ratingTier, wordOnEdge } from './clover'
 import type { Card } from './types'
 
 const card = (id: string, prefix: string): Card => ({
@@ -53,5 +53,20 @@ describe('ratingTier / isValidClue', () => {
     expect(isValidClue(' Eis-Bär ')).toBe(true)
     expect(isValidClue('two words')).toBe(false)
     expect(isValidClue('')).toBe(false)
+  })
+})
+
+describe('clueOnCard', () => {
+  const board = boardFromGuess([card('a', 'Feuer'), card('b', 'Wasser')], {
+    a: { slot: 0, rotation: 0 },
+    b: { slot: 1, rotation: 2 },
+  })
+  it('rejects words on placed cards, ignoring case and spaces', () => {
+    expect(clueOnCard(board, 'FeuerT')).toBe(true)
+    expect(clueOnCard(board, ' wasserl ')).toBe(true)
+  })
+  it('accepts other words', () => {
+    expect(clueOnCard(board, 'Feuer')).toBe(false)
+    expect(clueOnCard(board, '')).toBe(false)
   })
 })
